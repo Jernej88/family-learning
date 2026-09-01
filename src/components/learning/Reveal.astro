@@ -1,0 +1,16 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "Pokaži razlago" } = Astro.props;
+---
+
+<details class="learning-card disclosure disclosure--reveal">
+  <summary>
+    <span aria-hidden="true">💡</span>
+    {title}
+  </summary>
+  <div class="disclosure__content"><slot /></div>
+</details>
+

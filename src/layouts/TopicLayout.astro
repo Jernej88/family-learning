@@ -1,0 +1,46 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  category: string;
+  estimated_minutes: number;
+  recommended_age_min: number;
+  recommended_age_max: number;
+  last_verified: Date;
+  sources: Array<{ title: string; url: string; language: string }>;
+}
+
+const {
+  title,
+  description,
+  category,
+  estimated_minutes,
+  recommended_age_min,
+  recommended_age_max,
+  last_verified,
+  sources,
+} = Astro.props;
+const verifiedDate = new Intl.DateTimeFormat("sl-SI", { dateStyle: "long" }).format(last_verified);
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="topic-shell">
+    <header class="topic-hero">
+      <a class="back-link" href="/#teme">← Vse teme</a>
+      <p class="topic-hero__meta">{category} · {estimated_minutes} min · {recommended_age_min}–{recommended_age_max} let</p>
+      <h1>{title}</h1>
+      <p class="topic-hero__description">{description}</p>
+    </header>
+    <div class="story"><slot /></div>
+    <aside class="sources" aria-labelledby="sources-title">
+      <h2 id="sources-title">Viri in dodatno branje</h2>
+      <p>Vsebina nazadnje preverjena: <time datetime={last_verified.toISOString()}>{verifiedDate}</time>.</p>
+      <ul>
+        {sources.map((source) => <li><a href={source.url}>{source.title}</a> <span>({source.language})</span></li>)}
+      </ul>
+    </aside>
+  </article>
+</BaseLayout>
+

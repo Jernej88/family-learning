@@ -1,0 +1,43 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Družinsko učenje",
+  description = "Interaktivne zgodbe za radovedne družine.",
+} = Astro.props;
+const pageTitle = title === "Družinsko učenje" ? title : `${title} · Družinsko učenje`;
+---
+
+<!doctype html>
+<html lang="sl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#173f4f" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Preskoči na vsebino</a>
+    <header class="site-header">
+      <a class="site-brand" href="/" aria-label="Družinsko učenje, domača stran">
+        <span aria-hidden="true">✦</span>
+        Družinsko učenje
+      </a>
+      <nav aria-label="Glavna navigacija">
+        <a href="/#teme">Teme</a>
+        <a href="/about/">O projektu</a>
+      </nav>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <p>Znanje ostane v Git repozitoriju. Osebni napredek bo ostal na napravi.</p>
+    </footer>
+  </body>
+</html>
+

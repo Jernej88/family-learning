@@ -1,0 +1,19 @@
+---
+interface Props {
+  title: string;
+  slug: string;
+  description: string;
+  category: string;
+  estimatedMinutes: number;
+}
+
+const { title, slug, description, category, estimatedMinutes } = Astro.props;
+---
+
+<article class="topic-card">
+  <p class="topic-card__meta">{category} · {estimatedMinutes} min</p>
+  <h2><a href={`/topics/${slug}/`}>{title}</a></h2>
+  <p>{description}</p>
+  <a class="topic-card__action" href={`/topics/${slug}/`}>Začni raziskovati <span aria-hidden="true">→</span></a>
+</article>
+
