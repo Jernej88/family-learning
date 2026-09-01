@@ -1,25 +1,29 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
 
+import Quiz from "../../components/Quiz.astro";
 import TopicLayout from "../../layouts/TopicLayout.astro";
+import type { Quiz as QuizData } from "../../lib/content-schema";
+import { getTopicQuiz } from "../../lib/topic-quiz";
 
 interface Props {
   topic: CollectionEntry<"topics">;
+  quiz: QuizData;
 }
 
 export async function getStaticPaths() {
   const topics = await getCollection("topics", ({ data }) => data.status === "published");
   return topics.map((topic) => ({
     params: { slug: topic.data.slug },
-    props: { topic },
+    props: { topic, quiz: getTopicQuiz(topic.data.slug) },
   }));
 }
 
-const { topic } = Astro.props;
+const { topic, quiz } = Astro.props;
 const { Content } = await render(topic);
 ---
 
 <TopicLayout {...topic.data}>
   <Content />
+  <Quiz quiz={quiz} />
 </TopicLayout>
-
