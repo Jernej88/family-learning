@@ -11,14 +11,15 @@ Permanent knowledge therefore lives in Git as MDX and JSON. Astro builds it into
 
 ## Current scope
 
-Milestones 1–2 provide the interactive-story foundation and content contract:
+Milestones 1–3 provide the interactive-story foundation, content contract, and topic quiz:
 
 - a mobile-first Astro + MDX topic library;
 - nine reusable learning components;
 - validated topic metadata and reusable quiz data;
+- a five-question topic quiz with immediate explanations and device-local progress;
 - one complete topic, `Zakaj Luna ne pade na Zemljo?`.
 
-Quiz play, learning history, spaced recall, PWA support, and deployment belong to later milestones. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
+Profiles, learned-topic history, spaced recall, PWA support, and deployment belong to later milestones. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
 
 ## Run locally
 

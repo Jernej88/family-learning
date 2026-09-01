@@ -1,0 +1,218 @@
+---
+import type { Quiz } from "../lib/content-schema";
+
+interface Props {
+  quiz: Quiz;
+}
+
+const { quiz } = Astro.props;
+const serializedQuiz = JSON.stringify(quiz).replace(/</g, "\\u003c");
+---
+
+<section class="topic-quiz" data-topic-quiz aria-labelledby="topic-quiz-title">
+  <script type="application/json" data-quiz-data set:html={serializedQuiz} is:inline />
+
+  <div class="topic-quiz__intro" data-quiz-intro>
+    <p class="eyebrow">🎯 Preveri znanje</p>
+    <h2 id="topic-quiz-title">Kaj si odnesel iz zgodbe?</h2>
+    <p>Odgovori na pet vprašanj. Po vsakem odgovoru dobiš kratko razlago.</p>
+    <button class="button" type="button" data-quiz-start>Začni kviz</button>
+  </div>
+
+  <div class="topic-quiz__player" data-quiz-player hidden>
+    <div class="topic-quiz__progress-row">
+      <p id="topic-quiz-progress-label" data-quiz-progress-label></p>
+      <progress
+        data-quiz-progress
+        max="5"
+        value="0"
+        aria-labelledby="topic-quiz-progress-label"
+      ></progress>
+    </div>
+    <h2 class="topic-quiz__question" data-quiz-question tabindex="-1"></h2>
+    <div class="topic-quiz__options" data-quiz-options></div>
+    <div
+      class="topic-quiz__feedback"
+      data-quiz-feedback
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      tabindex="-1"
+    >
+      <p class="topic-quiz__feedback-title" data-quiz-feedback-title></p>
+      <p data-quiz-correction hidden></p>
+      <p data-quiz-explanation></p>
+    </div>
+    <button class="button topic-quiz__next" type="button" data-quiz-next hidden>
+      Naslednje vprašanje
+    </button>
+  </div>
+
+  <div class="topic-quiz__summary" data-quiz-summary hidden>
+    <p class="eyebrow">✓ Kviz končan</p>
+    <h2 data-quiz-summary-title tabindex="-1"></h2>
+    <p data-quiz-summary-text></p>
+    <button class="button" type="button" data-quiz-restart>Poskusi znova</button>
+  </div>
+
+  <noscript><p>Za reševanje kviza mora biti v brskalniku omogočen JavaScript.</p></noscript>
+</section>
+
+<script>
+  import type { Quiz } from "../lib/content-schema";
+  import {
+    advanceQuizSession,
+    answerCurrentQuestion,
+    createQuizSession,
+    getCorrectAnswerIndex,
+    getQuestionOptions,
+    type QuizQuestion,
+  } from "../lib/quiz-session";
+  import {
+    clearQuizSession,
+    loadQuizSession,
+    saveQuizSession,
+    type QuizStorage,
+  } from "../lib/quiz-storage";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-topic-quiz]")) {
+    if (root.dataset.ready === "true") continue;
+    root.dataset.ready = "true";
+
+    const data = root.querySelector<HTMLElement>("[data-quiz-data]");
+    if (!data?.textContent) continue;
+    const quiz = JSON.parse(data.textContent) as Quiz;
+    const questionsById = new Map(quiz.questions.map((question) => [question.id, question]));
+
+    const intro = root.querySelector<HTMLElement>("[data-quiz-intro]")!;
+    const player = root.querySelector<HTMLElement>("[data-quiz-player]")!;
+    const summary = root.querySelector<HTMLElement>("[data-quiz-summary]")!;
+    const startButton = root.querySelector<HTMLButtonElement>("[data-quiz-start]")!;
+    const restartButton = root.querySelector<HTMLButtonElement>("[data-quiz-restart]")!;
+    const progressLabel = root.querySelector<HTMLElement>("[data-quiz-progress-label]")!;
+    const progress = root.querySelector<HTMLProgressElement>("[data-quiz-progress]")!;
+    const questionHeading = root.querySelector<HTMLElement>("[data-quiz-question]")!;
+    const optionsContainer = root.querySelector<HTMLElement>("[data-quiz-options]")!;
+    const feedback = root.querySelector<HTMLElement>("[data-quiz-feedback]")!;
+    const feedbackTitle = root.querySelector<HTMLElement>("[data-quiz-feedback-title]")!;
+    const correction = root.querySelector<HTMLElement>("[data-quiz-correction]")!;
+    const explanation = root.querySelector<HTMLElement>("[data-quiz-explanation]")!;
+    const nextButton = root.querySelector<HTMLButtonElement>("[data-quiz-next]")!;
+    const summaryTitle = root.querySelector<HTMLElement>("[data-quiz-summary-title]")!;
+    const summaryText = root.querySelector<HTMLElement>("[data-quiz-summary-text]")!;
+
+    let storage: QuizStorage | undefined;
+    try {
+      storage = window.localStorage;
+    } catch {
+      storage = undefined;
+    }
+
+    let session = loadQuizSession(storage, quiz);
+
+    function currentQuestion(): QuizQuestion {
+      return questionsById.get(session!.questionIds[session!.currentIndex])!;
+    }
+
+    function renderSession(moveFocus = false): void {
+      if (!session) return;
+
+      intro.hidden = true;
+      player.hidden = session.completed;
+      summary.hidden = !session.completed;
+
+      if (session.completed) {
+        const correctAnswers = Object.values(session.answers).filter((answer) => answer.correct).length;
+        summaryTitle.textContent = `${correctAnswers} od ${session.questionIds.length} pravilno`;
+        summaryText.textContent =
+          correctAnswers === session.questionIds.length
+            ? "Odlično! Ključne ideje imaš res dobro v rokah."
+            : "Dobro opravljeno. Razlage pri vprašanjih pomagajo utrditi še težje dele.";
+        if (moveFocus) summaryTitle.focus();
+        return;
+      }
+
+      const question = currentQuestion();
+      const answer = session.answers[question.id];
+      const options = getQuestionOptions(question);
+      const correctIndex = getCorrectAnswerIndex(question);
+
+      progress.max = session.questionIds.length;
+      progress.value = session.currentIndex + (answer ? 1 : 0);
+      progressLabel.textContent = `Vprašanje ${session.currentIndex + 1} od ${session.questionIds.length}`;
+      questionHeading.textContent = question.question;
+      optionsContainer.replaceChildren();
+
+      options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "topic-quiz__option";
+        button.dataset.quizOption = String(index);
+        button.disabled = Boolean(answer);
+        button.setAttribute("aria-pressed", answer?.selectedIndex === index ? "true" : "false");
+
+        const marker = document.createElement("span");
+        marker.textContent = String.fromCharCode(65 + index);
+        marker.setAttribute("aria-hidden", "true");
+        button.append(marker, document.createTextNode(option));
+
+        if (answer?.selectedIndex === index) {
+          button.classList.add(answer.correct ? "is-correct" : "is-incorrect");
+        } else if (answer && index === correctIndex) {
+          button.classList.add("is-correct");
+        }
+
+        button.addEventListener("click", () => {
+          session = answerCurrentQuestion(session!, question, index);
+          saveQuizSession(storage, session);
+          renderSession();
+          feedback.focus();
+        });
+        optionsContainer.append(button);
+      });
+
+      feedback.classList.toggle("is-active", Boolean(answer));
+      nextButton.hidden = !answer;
+      if (answer) {
+        feedbackTitle.textContent = answer.correct ? "✓ Pravilen odgovor!" : "Ni čisto.";
+        correction.hidden = answer.correct;
+        correction.textContent = answer.correct
+          ? ""
+          : `Pravilen odgovor je: ${options[correctIndex]}.`;
+        explanation.textContent = question.explanation;
+        nextButton.textContent =
+          session.currentIndex === session.questionIds.length - 1
+            ? "Pokaži rezultat"
+            : "Naslednje vprašanje";
+      } else {
+        feedbackTitle.textContent = "";
+        correction.hidden = true;
+        correction.textContent = "";
+        explanation.textContent = "";
+      }
+
+      if (moveFocus) questionHeading.focus();
+    }
+
+    startButton.addEventListener("click", () => {
+      session = createQuizSession(quiz);
+      saveQuizSession(storage, session);
+      renderSession(true);
+    });
+
+    nextButton.addEventListener("click", () => {
+      session = advanceQuizSession(session!);
+      saveQuizSession(storage, session);
+      renderSession(true);
+    });
+
+    restartButton.addEventListener("click", () => {
+      clearQuizSession(storage, quiz.topic);
+      session = createQuizSession(quiz);
+      saveQuizSession(storage, session);
+      renderSession(true);
+    });
+
+    if (session) renderSession();
+  }
+</script>
