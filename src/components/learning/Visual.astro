@@ -1,18 +1,44 @@
 ---
-interface Props {
-  type?: "orbit" | "custom";
-  src?: string;
-  alt?: string;
+type ImageProps = {
+  src: string;
+  alt: string;
   caption: string;
+  type?: never;
+};
+
+type OrbitProps = {
+  type: "orbit";
+  caption: string;
+  src?: never;
+  alt?: never;
+};
+
+type CustomProps = {
+  type?: "custom";
+  caption: string;
+  src?: never;
+  alt?: never;
+};
+
+type Props = ImageProps | OrbitProps | CustomProps;
+
+const props = Astro.props;
+let image: { src: string; alt: string } | undefined;
+
+if (typeof props.src === "string") {
+  if (typeof props.alt !== "string" || props.src.trim() === "" || props.alt.trim() === "") {
+    throw new Error("Visual images require non-empty src and alt props.");
+  }
+  image = { src: props.src, alt: props.alt };
 }
 
-const { type = "custom", src, alt = "", caption } = Astro.props;
+const { type = "custom", caption } = props;
 ---
 
 <figure class="learning-visual">
   {
-    src ? (
-      <img src={src} alt={alt} loading="lazy" />
+    image ? (
+      <img src={image.src} alt={image.alt} loading="lazy" />
     ) : type === "orbit" ? (
       <svg viewBox="0 0 640 360" role="img" aria-labelledby="orbit-title orbit-description">
         <title id="orbit-title">Lunina orbita okoli Zemlje</title>
@@ -42,4 +68,3 @@ const { type = "custom", src, alt = "", caption } = Astro.props;
   }
   <figcaption>{caption}</figcaption>
 </figure>
-

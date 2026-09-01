@@ -35,6 +35,7 @@ Before opening a pull request:
 ```bash
 npm run validate
 npm test
+npm run test:subpath
 npm run build
 ```
 
@@ -58,4 +59,3 @@ npm run build
 4. Run `npm run validate`; the homepage and route are generated automatically.
 
 Content should contain no child names, photos, birthdays, or learning results. AI may help research and author a proposal, but a parent reviews it before publication.
-

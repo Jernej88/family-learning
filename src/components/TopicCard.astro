@@ -1,4 +1,6 @@
 ---
+import { internalUrl } from "../lib/internal-url";
+
 interface Props {
   title: string;
   slug: string;
@@ -8,12 +10,12 @@ interface Props {
 }
 
 const { title, slug, description, category, estimatedMinutes } = Astro.props;
+const topicUrl = internalUrl(`topics/${slug}/`, import.meta.env.BASE_URL);
 ---
 
 <article class="topic-card">
   <p class="topic-card__meta">{category} · {estimatedMinutes} min</p>
-  <h2><a href={`/topics/${slug}/`}>{title}</a></h2>
+  <h2><a href={topicUrl}>{title}</a></h2>
   <p>{description}</p>
-  <a class="topic-card__action" href={`/topics/${slug}/`}>Začni raziskovati <span aria-hidden="true">→</span></a>
+  <a class="topic-card__action" href={topicUrl}>Začni raziskovati <span aria-hidden="true">→</span></a>
 </article>
-

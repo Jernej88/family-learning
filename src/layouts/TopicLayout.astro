@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import { internalUrl } from "../lib/internal-url";
 
 interface Props {
   title: string;
@@ -23,12 +24,13 @@ const {
   sources,
 } = Astro.props;
 const verifiedDate = new Intl.DateTimeFormat("sl-SI", { dateStyle: "long" }).format(last_verified);
+const topicsUrl = internalUrl("#teme", import.meta.env.BASE_URL);
 ---
 
 <BaseLayout title={title} description={description}>
   <article class="topic-shell">
     <header class="topic-hero">
-      <a class="back-link" href="/#teme">← Vse teme</a>
+      <a class="back-link" href={topicsUrl}>← Vse teme</a>
       <p class="topic-hero__meta">{category} · {estimated_minutes} min · {recommended_age_min}–{recommended_age_max} let</p>
       <h1>{title}</h1>
       <p class="topic-hero__description">{description}</p>
@@ -43,4 +45,3 @@ const verifiedDate = new Intl.DateTimeFormat("sl-SI", { dateStyle: "long" }).for
     </aside>
   </article>
 </BaseLayout>
-

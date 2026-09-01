@@ -7,6 +7,15 @@ const sourceSchema = z.object({
   authority: z.enum(["primary", "institutional", "reference"]),
 });
 
+export const dateOnlySchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "must use YYYY-MM-DD format")
+  .refine((value) => {
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+    return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
+  }, "must be a valid calendar date")
+  .transform((value) => new Date(`${value}T00:00:00.000Z`));
+
 export const topicSchema = z
   .object({
     title: z.string().min(1),
@@ -14,9 +23,9 @@ export const topicSchema = z
     description: z.string().min(20).max(180),
     category: z.string().min(1),
     tags: z.array(z.string().min(1)).min(1),
-    created: z.coerce.date(),
-    last_updated: z.coerce.date(),
-    last_verified: z.coerce.date(),
+    created: dateOnlySchema,
+    last_updated: dateOnlySchema,
+    last_verified: dateOnlySchema,
     stability: z.enum(["stable", "developing", "changing"]),
     review_interval_days: z.number().int().positive(),
     recommended_age_min: z.number().int().min(5).max(18),
@@ -85,4 +94,3 @@ export const quizSchema = z.object({
 
 export type Topic = z.infer<typeof topicSchema>;
 export type Quiz = z.infer<typeof quizSchema>;
-

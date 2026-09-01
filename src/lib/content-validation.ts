@@ -1,3 +1,8 @@
+import remarkMdx from "remark-mdx";
+import remarkParse from "remark-parse";
+import { unified } from "unified";
+import { visit } from "unist-util-visit";
+
 import { quizSchema, type Quiz } from "./content-schema";
 
 const meaningfulInteractions = [
@@ -11,16 +16,32 @@ const meaningfulInteractions = [
 
 export function validateStorySource(source: string): string[] {
   const errors: string[] = [];
-  const interactionPattern = new RegExp(`<(${meaningfulInteractions.join("|")})\\b`, "g");
-  const interactionCount = [...source.matchAll(interactionPattern)].length;
+  const components: string[] = [];
+
+  try {
+    const tree = unified().use(remarkParse).use(remarkMdx).parse(source);
+    visit(tree, "mdxJsxFlowElement", (node) => {
+      if (typeof node.name === "string") components.push(node.name);
+    });
+  } catch (error) {
+    return [`published story contains invalid MDX: ${String(error)}`];
+  }
+
+  const recapIndex = components.indexOf("KeyFacts");
+  const preRecapComponents = recapIndex === -1 ? components : components.slice(0, recapIndex);
+  const interactionCount = preRecapComponents.filter((name) =>
+    meaningfulInteractions.includes(name),
+  ).length;
 
   if (interactionCount < 3) {
-    errors.push("published stories need at least three meaningful inline interactions");
+    errors.push(
+      "published stories need at least three meaningful inline interactions before the KeyFacts recap",
+    );
   }
-  if (!source.includes("<KeyFacts")) {
+  if (recapIndex === -1) {
     errors.push("published stories need a KeyFacts recap");
   }
-  if (!source.includes("<ParentNote")) {
+  if (!components.includes("ParentNote")) {
     errors.push("published stories need a ParentNote for caveats or discussion guidance");
   }
 
@@ -55,4 +76,3 @@ export function validateQuiz(input: unknown, expectedTopic: string): {
 
   return { data: result.data, errors };
 }
-

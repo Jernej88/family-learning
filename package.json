@@ -13,7 +13,8 @@
     "check": "astro check",
     "validate:content": "tsx scripts/validate-content.ts",
     "validate": "npm run check && npm run validate:content",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:subpath": "astro build && tsx scripts/validate-subpath-build.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.0",
@@ -23,8 +24,12 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "@types/node": "^24.0.0",
+    "remark-mdx": "^3.1.1",
+    "remark-parse": "^11.0.0",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0",
     "vitest": "^4.0.0"
   }
 }

@@ -25,9 +25,9 @@ slug: "matching-directory-slug"
 description: "A concrete 20–180 character summary."
 category: "vesolje"
 tags: [luna, gravitacija]
-created: 2026-09-01
-last_updated: 2026-09-01
-last_verified: 2026-09-01
+created: "2026-09-01"
+last_updated: "2026-09-01"
+last_verified: "2026-09-01"
 stability: stable # stable | developing | changing
 review_interval_days: 365
 recommended_age_min: 7
@@ -96,4 +96,3 @@ For `true_false`, omit `options` and use a boolean `correct`. IDs must be unique
 3. Set `status: draft` while reviewing factual accuracy, Slovenian clarity, safety, and source quality.
 4. Set `status: published` and run `npm run validate`, `npm test`, and `npm run build`.
 5. Submit for human review; generated educational content is never published automatically.
-
