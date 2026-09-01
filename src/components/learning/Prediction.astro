@@ -1,0 +1,15 @@
+---
+import Choice from "./Choice.astro";
+
+interface Props {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+}
+
+const props = Astro.props;
+---
+
+<Choice {...props} kind="prediction" />
+

@@ -1,0 +1,16 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="learning-card key-facts" aria-labelledby="key-facts-title">
+  <p class="learning-card__eyebrow">🧠 Kaj si zapomnimo?</p>
+  <h2 class="learning-card__title" id="key-facts-title">Tri ključne ideje</h2>
+  <ul>
+    {items.map((item) => <li>{item}</li>)}
+  </ul>
+</section>
+

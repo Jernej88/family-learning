@@ -1,0 +1,64 @@
+---
+interface Props {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+  kind?: "choice" | "prediction";
+}
+
+const { question, options, correct, explanation, kind = "choice" } = Astro.props;
+const eyebrow = kind === "prediction" ? "🤔 Najprej napovej" : "🎯 Izberi odgovor";
+---
+
+<section class:list={["learning-card", "answerable", `answerable--${kind}`]} data-answerable>
+  <p class="learning-card__eyebrow">{eyebrow}</p>
+  <h2 class="learning-card__title">{question}</h2>
+  <div class="answerable__options">
+    {
+      options.map((option, index) => (
+        <button
+          type="button"
+          class="answerable__option"
+          data-answer-option
+          data-correct={index === correct ? "true" : "false"}
+          aria-pressed="false"
+        >
+          <span aria-hidden="true">{String.fromCharCode(65 + index)}</span>
+          {option}
+        </button>
+      ))
+    }
+  </div>
+  <p class="answerable__feedback" data-answer-feedback aria-live="polite"></p>
+  <p class="answerable__explanation" data-answer-explanation hidden>{explanation}</p>
+</section>
+
+<script>
+  for (const card of document.querySelectorAll<HTMLElement>("[data-answerable]")) {
+    if (card.dataset.ready === "true") continue;
+    card.dataset.ready = "true";
+
+    const buttons = card.querySelectorAll<HTMLButtonElement>("[data-answer-option]");
+    const feedback = card.querySelector<HTMLElement>("[data-answer-feedback]");
+    const explanation = card.querySelector<HTMLElement>("[data-answer-explanation]");
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        const isCorrect = button.dataset.correct === "true";
+        for (const option of buttons) {
+          option.classList.remove("is-selected", "is-correct", "is-incorrect");
+          option.setAttribute("aria-pressed", "false");
+        }
+        button.classList.add("is-selected", isCorrect ? "is-correct" : "is-incorrect");
+        button.setAttribute("aria-pressed", "true");
+        if (feedback) {
+          feedback.textContent = isCorrect
+            ? "✓ Dobro razmišljaš!"
+            : "Ni čisto — razlaga spodaj pove, zakaj.";
+        }
+        if (explanation) explanation.hidden = false;
+      });
+    }
+  }
+</script>

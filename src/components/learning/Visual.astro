@@ -1,0 +1,70 @@
+---
+type ImageProps = {
+  src: string;
+  alt: string;
+  caption: string;
+  type?: never;
+};
+
+type OrbitProps = {
+  type: "orbit";
+  caption: string;
+  src?: never;
+  alt?: never;
+};
+
+type CustomProps = {
+  type?: "custom";
+  caption: string;
+  src?: never;
+  alt?: never;
+};
+
+type Props = ImageProps | OrbitProps | CustomProps;
+
+const props = Astro.props;
+let image: { src: string; alt: string } | undefined;
+
+if (typeof props.src === "string") {
+  if (typeof props.alt !== "string" || props.src.trim() === "" || props.alt.trim() === "") {
+    throw new Error("Visual images require non-empty src and alt props.");
+  }
+  image = { src: props.src, alt: props.alt };
+}
+
+const { type = "custom", caption } = props;
+---
+
+<figure class="learning-visual">
+  {
+    image ? (
+      <img src={image.src} alt={image.alt} loading="lazy" />
+    ) : type === "orbit" ? (
+      <svg viewBox="0 0 640 360" role="img" aria-labelledby="orbit-title orbit-description">
+        <title id="orbit-title">Lunina orbita okoli Zemlje</title>
+        <desc id="orbit-description">
+          Zemlja je v središču, Luna pa se premika po ukrivljeni poti. Puščici pokažeta
+          gibanje naprej in gravitacijo proti Zemlji.
+        </desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M0 0L8 4L0 8Z" fill="currentColor" />
+          </marker>
+        </defs>
+        <ellipse class="orbit-line" cx="320" cy="180" rx="230" ry="118" />
+        <circle class="earth" cx="320" cy="180" r="58" />
+        <path class="earth-land" d="M285 147c24-22 56-26 82-7l-16 16 8 20-24 11-13-18-26 6z" />
+        <circle class="moon" cx="520" cy="121" r="27" />
+        <path class="motion-arrow" d="M507 85c-24-17-49-20-72-14" marker-end="url(#arrow)" />
+        <path class="gravity-arrow" d="M492 133L380 166" marker-end="url(#arrow)" />
+        <text x="438" y="55">gibanje naprej</text>
+        <text x="405" y="165">gravitacija</text>
+        <text x="292" y="254">Zemlja</text>
+        <text x="500" y="166">Luna</text>
+      </svg>
+    ) : (
+      <div class="learning-visual__custom"><slot /></div>
+    )
+  }
+  <figcaption>{caption}</figcaption>
+</figure>

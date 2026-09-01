@@ -1,0 +1,46 @@
+---
+import "../styles/global.css";
+import { internalUrl } from "../lib/internal-url";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Družinsko učenje",
+  description = "Interaktivne zgodbe za radovedne družine.",
+} = Astro.props;
+const pageTitle = title === "Družinsko učenje" ? title : `${title} · Družinsko učenje`;
+const homeUrl = internalUrl("", import.meta.env.BASE_URL);
+const topicsUrl = internalUrl("#teme", import.meta.env.BASE_URL);
+const aboutUrl = internalUrl("about/", import.meta.env.BASE_URL);
+---
+
+<!doctype html>
+<html lang="sl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#173f4f" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Preskoči na vsebino</a>
+    <header class="site-header">
+      <a class="site-brand" href={homeUrl} aria-label="Družinsko učenje, domača stran">
+        <span aria-hidden="true">✦</span>
+        Družinsko učenje
+      </a>
+      <nav aria-label="Glavna navigacija">
+        <a href={topicsUrl}>Teme</a>
+        <a href={aboutUrl}>O projektu</a>
+      </nav>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <p>Znanje ostane v Git repozitoriju. Osebni napredek bo ostal na napravi.</p>
+    </footer>
+  </body>
+</html>

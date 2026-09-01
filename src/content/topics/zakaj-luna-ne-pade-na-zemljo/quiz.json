@@ -1,0 +1,166 @@
+{
+  "topic": "zakaj-luna-ne-pade-na-zemljo",
+  "questions": [
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-001",
+      "type": "multiple_choice",
+      "concept": "gravitacija",
+      "difficulty": 1,
+      "age_min": 7,
+      "question": "Katera sila vleče Luno proti Zemlji?",
+      "options": ["Veter", "Gravitacija", "Svetloba", "Magnetizem"],
+      "correct": 1,
+      "explanation": "Zemljina gravitacija privlači Luno in ves čas ukrivlja njeno pot."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-002",
+      "type": "true_false",
+      "concept": "gravitacija-v-vesolju",
+      "difficulty": 1,
+      "age_min": 7,
+      "question": "V vesolju gravitacija popolnoma izgine.",
+      "correct": false,
+      "explanation": "Gravitacija deluje tudi v vesolju; prav ona drži Luno v orbiti okoli Zemlje."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-003",
+      "type": "multiple_choice",
+      "concept": "orbita",
+      "difficulty": 1,
+      "age_min": 7,
+      "question": "Zakaj Luna med padanjem ne zadene Zemlje?",
+      "options": ["Ker se hitro giblje naprej", "Ker je zelo lahka", "Ker jo odbija zrak"],
+      "correct": 0,
+      "explanation": "Luna se giblje naprej tako hitro, da med padanjem ukrivljeno Zemljo vedno znova zgreši."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-004",
+      "type": "multiple_choice",
+      "concept": "hitrost-naprej",
+      "difficulty": 2,
+      "age_min": 7,
+      "question": "Kaj bi se zgodilo, če bi Luna izgubila vso hitrost naprej?",
+      "options": ["Odletela bi stran", "Začela bi padati proti Zemlji", "Ostala bi pri miru"],
+      "correct": 1,
+      "explanation": "Brez gibanja naprej Luna ne bi več zgrešila Zemlje; gravitacija bi jo vlekla proti njej."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-005",
+      "type": "multiple_choice",
+      "concept": "orbita",
+      "difficulty": 1,
+      "age_min": 7,
+      "question": "Kaj najbolje opiše orbito?",
+      "options": ["Ravna pot brez sil", "Ukrivljena pot okoli telesa", "Mesto brez gravitacije"],
+      "correct": 1,
+      "explanation": "Orbita je ukrivljena pot telesa okoli drugega telesa pod vplivom gravitacije."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-006",
+      "type": "true_false",
+      "concept": "prosti-pad",
+      "difficulty": 2,
+      "age_min": 8,
+      "question": "Luno lahko opišemo kot telo v nenehnem prostem padu.",
+      "correct": true,
+      "explanation": "Luna nenehno pada proti Zemlji, vendar jo zaradi hitrosti naprej vedno zgreši."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-007",
+      "type": "multiple_choice",
+      "concept": "smer-gibanja",
+      "difficulty": 2,
+      "age_min": 8,
+      "question": "Kaj gravitacija predvsem spreminja pri Luninem gibanju?",
+      "options": ["Njeno barvo", "Smer njenega gibanja", "Njeno sestavo"],
+      "correct": 1,
+      "explanation": "Gravitacija pospešuje Luno proti Zemlji in zato nenehno spreminja smer njene poti."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-008",
+      "type": "true_false",
+      "concept": "oblika-orbite",
+      "difficulty": 2,
+      "age_min": 9,
+      "question": "Lunina orbita je popoln krog.",
+      "correct": false,
+      "explanation": "Lunina orbita je rahlo eliptična, zato njena oddaljenost od Zemlje ni vedno enaka."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-009",
+      "type": "multiple_choice",
+      "concept": "obhodni-cas",
+      "difficulty": 2,
+      "age_min": 9,
+      "question": "Približno koliko časa potrebuje Luna za en obhod okoli Zemlje?",
+      "options": ["En dan", "En teden", "27 dni", "Eno leto"],
+      "correct": 2,
+      "explanation": "Luna opravi en obhod okoli Zemlje v približno 27 dneh."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-010",
+      "type": "multiple_choice",
+      "concept": "oddaljenost",
+      "difficulty": 3,
+      "age_min": 10,
+      "question": "Kolikšna je približna povprečna razdalja med Zemljo in Luno?",
+      "options": ["384 km", "3.840 km", "38.400 km", "384.000 km"],
+      "correct": 3,
+      "explanation": "Povprečna razdalja je približno 384.000 kilometrov."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-011",
+      "type": "true_false",
+      "concept": "medsebojna-gravitacija",
+      "difficulty": 2,
+      "age_min": 9,
+      "question": "Tudi Luna s svojo gravitacijo privlači Zemljo.",
+      "correct": true,
+      "explanation": "Gravitacija je medsebojna: Zemlja privlači Luno, Luna pa privlači Zemljo."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-012",
+      "type": "multiple_choice",
+      "concept": "prosti-pad",
+      "difficulty": 2,
+      "age_min": 8,
+      "question": "Zakaj astronavti v plovilu v orbiti lebdijo?",
+      "options": ["Ker skupaj s plovilom padajo okoli Zemlje", "Ker nimajo mase", "Ker jih Luna potiska navzgor"],
+      "correct": 0,
+      "explanation": "Astronavti in plovilo so skupaj v prostem padu, zato drug glede na drugega lebdijo."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-013",
+      "type": "multiple_choice",
+      "concept": "newtonov-poskus",
+      "difficulty": 3,
+      "age_min": 10,
+      "question": "Kaj pokaže Newtonov miselni poskus z zelo hitro izstreljeno kroglo?",
+      "options": ["Da hitra krogla nima mase", "Da lahko padanje postane orbita", "Da gravitacija deluje samo blizu tal"],
+      "correct": 1,
+      "explanation": "Če se telo giblje dovolj hitro naprej, med padanjem sledi ukrivljenosti Zemlje in jo zgreši."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-014",
+      "type": "true_false",
+      "concept": "zrak-in-orbita",
+      "difficulty": 2,
+      "age_min": 8,
+      "question": "Zrak drži Luno v orbiti okoli Zemlje.",
+      "correct": false,
+      "explanation": "Luno v orbiti ohranjata njeno gibanje in gravitacija, ne zrak."
+    },
+    {
+      "id": "zakaj-luna-ne-pade-na-zemljo-015",
+      "type": "multiple_choice",
+      "concept": "orbita",
+      "difficulty": 2,
+      "age_min": 7,
+      "question": "Kateri dve ideji skupaj najpreprosteje razložita Lunino orbito?",
+      "options": ["Svetloba in tema", "Gibanje naprej in padanje", "Toplota in mraz"],
+      "correct": 1,
+      "explanation": "Luna se hitro giblje naprej, gravitacija pa jo ves čas vleče v padanje proti Zemlji."
+    }
+  ]
+}
+

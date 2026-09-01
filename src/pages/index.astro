@@ -1,0 +1,49 @@
+---
+import { getCollection } from "astro:content";
+
+import TopicCard from "../components/TopicCard.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const topics = (await getCollection("topics", ({ data }) => data.status === "published")).sort(
+  (left, right) => right.data.last_updated.valueOf() - left.data.last_updated.valueOf(),
+);
+---
+
+<BaseLayout>
+  <section class="home-hero">
+    <div>
+      <p class="eyebrow">Skupaj vprašamo. Skupaj odkrijemo.</p>
+      <h1>Kaj bomo danes odkrili?</h1>
+      <p>
+        Kratke interaktivne zgodbe v slovenščini pomagajo otrokom napovedati, poskusiti,
+        razumeti in si zapomniti.
+      </p>
+      <a class="button" href="#teme">Izberi temo</a>
+    </div>
+    <div class="home-hero__orbit" aria-hidden="true">
+      <span class="home-hero__earth">🌍</span>
+      <span class="home-hero__moon">🌙</span>
+    </div>
+  </section>
+
+  <section class="topic-list" id="teme" aria-labelledby="topics-title">
+    <div class="section-heading">
+      <p class="eyebrow">Knjižnica</p>
+      <h2 id="topics-title">Začni z vprašanjem</h2>
+    </div>
+    <div class="topic-grid">
+      {
+        topics.map(({ data }) => (
+          <TopicCard
+            title={data.title}
+            slug={data.slug}
+            description={data.description}
+            category={data.category}
+            estimatedMinutes={data.estimated_minutes}
+          />
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+

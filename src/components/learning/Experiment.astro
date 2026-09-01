@@ -1,0 +1,16 @@
+---
+interface Props {
+  title: string;
+  materials?: string;
+}
+
+const { title, materials } = Astro.props;
+---
+
+<section class="learning-card experiment">
+  <p class="learning-card__eyebrow">🧪 Poskusi</p>
+  <h2 class="learning-card__title">{title}</h2>
+  {materials && <p class="experiment__materials"><strong>Potrebuješ:</strong> {materials}</p>}
+  <div><slot /></div>
+</section>
+
