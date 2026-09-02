@@ -14,6 +14,7 @@
     "validate:content": "tsx scripts/validate-content.ts",
     "validate": "npm run check && npm run validate:content",
     "test": "vitest run",
+    "test:root-build": "BASE_PATH=/ SITE_URL=https://example.test npm run build && BASE_PATH=/ SITE_URL=https://example.test tsx scripts/validate-subpath-build.ts",
     "test:subpath": "npm run build && tsx scripts/validate-subpath-build.ts"
   },
   "dependencies": {

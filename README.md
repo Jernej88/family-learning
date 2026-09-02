@@ -21,7 +21,7 @@ Milestones 1–4 provide the interactive-story foundation, content contract, top
 - a transparent spaced-repetition schedule and five-question daily challenge;
 - one complete topic, `Zakaj Luna ne pade na Zemljo?`.
 
-Milestone 5 adds installable PWA support: the published application has home-screen icons, an offline-capable cache of its generated content, and mobile app navigation. Deployment and automated knowledge maintenance remain later milestones. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
+Milestone 5 adds installable PWA support: the published application has home-screen icons, an offline-capable cache of its generated content, and mobile app navigation. Milestone 6 validates every change in GitHub Actions and deploys valid changes merged to `main` to GitHub Pages. Automated knowledge maintenance remains a later milestone. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
 
 ## Run locally
 
@@ -38,9 +38,16 @@ Before opening a pull request:
 ```bash
 npm run validate
 npm test
+npm run test:root-build
 npm run test:subpath
 npm run build
 ```
+
+## Deployment
+
+The production site is published at [Jernej88.github.io/family-learning](https://jernej88.github.io/family-learning/). GitHub Actions validates pull requests and publishes valid pushes to `main`.
+
+Before the first deployment, configure the repository in **Settings → Pages → Build and deployment → Source** to use **GitHub Actions**. The deployment workflow builds the project-site version at `/family-learning/`; do not change that base path unless the hosting model changes.
 
 ## Repository map
 
