@@ -9,12 +9,12 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && tsx scripts/generate-pwa.ts",
     "check": "astro check",
     "validate:content": "tsx scripts/validate-content.ts",
     "validate": "npm run check && npm run validate:content",
     "test": "vitest run",
-    "test:subpath": "astro build && tsx scripts/validate-subpath-build.ts"
+    "test:subpath": "npm run build && tsx scripts/validate-subpath-build.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.0",

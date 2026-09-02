@@ -1,0 +1,59 @@
+---
+import { internalUrl } from "../lib/internal-url";
+
+const serviceWorkerUrl = internalUrl("sw.js", import.meta.env.BASE_URL);
+const scope = internalUrl("", import.meta.env.BASE_URL);
+---
+
+<p class="pwa-offline" data-pwa-offline role="status" hidden>
+  Brez povezave. Na voljo je shranjena različica.
+</p>
+
+<aside class="pwa-update" data-pwa-update aria-labelledby="pwa-update-title" role="status" hidden>
+  <p id="pwa-update-title">Na voljo je nova različica.</p>
+  <button class="text-button" type="button" data-pwa-update-button>Osveži</button>
+</aside>
+
+<script is:inline define:vars={{ serviceWorkerUrl, scope }}>
+  const offline = document.querySelector("[data-pwa-offline]");
+  const update = document.querySelector("[data-pwa-update]");
+  const updateButton = document.querySelector("[data-pwa-update-button]");
+  let refreshing = false;
+
+  function renderConnection() {
+    if (offline) offline.hidden = navigator.onLine;
+  }
+
+  function offerUpdate(registration) {
+    if (registration.waiting && update) update.hidden = false;
+  }
+
+  renderConnection();
+  window.addEventListener("online", renderConnection);
+  window.addEventListener("offline", renderConnection);
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .register(serviceWorkerUrl, { scope, updateViaCache: "none" })
+      .then((registration) => {
+        offerUpdate(registration);
+        registration.addEventListener("updatefound", () => {
+          const worker = registration.installing;
+          worker?.addEventListener("statechange", () => {
+            if (worker.state === "installed" && navigator.serviceWorker.controller) offerUpdate(registration);
+          });
+        });
+        updateButton?.addEventListener("click", () => {
+          refreshing = true;
+          registration.waiting?.postMessage({ type: "SKIP_WAITING" });
+        });
+      })
+      .catch(() => {
+        // Reading remains fully usable when a browser does not allow service workers.
+      });
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshing) window.location.reload();
+    });
+  }
+</script>

@@ -21,7 +21,7 @@ Milestones 1–4 provide the interactive-story foundation, content contract, top
 - a transparent spaced-repetition schedule and five-question daily challenge;
 - one complete topic, `Zakaj Luna ne pade na Zemljo?`.
 
-PWA support, deployment, and automated knowledge maintenance belong to later milestones. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
+Milestone 5 adds installable PWA support: the published application has home-screen icons, an offline-capable cache of its generated content, and mobile app navigation. Deployment and automated knowledge maintenance remain later milestones. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
 
 ## Run locally
 
