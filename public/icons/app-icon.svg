@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title>Družinsko učenje</title>
+  <rect width="512" height="512" rx="104" fill="#176b70"/>
+  <circle cx="256" cy="256" r="174" fill="#dff3ef"/>
+  <path d="M163 189c50-25 99-25 149 0v143c-50-25-99-25-149 0z" fill="#fff"/>
+  <path d="M349 189c-50-25-99-25-149 0v143c50-25 99-25 149 0z" fill="#fff"/>
+  <path d="M256 190v143" fill="none" stroke="#176b70" stroke-width="12" stroke-linecap="round"/>
+  <path d="m346 102 13 29 29 13-29 13-13 29-13-29-29-13 29-13z" fill="#f5b841"/>
+</svg>

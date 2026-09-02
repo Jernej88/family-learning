@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import ProfilePicker from "../components/ProfilePicker.astro";
+import PwaStatus from "../components/PwaStatus.astro";
 import { internalUrl } from "../lib/internal-url";
 
 interface Props {
@@ -17,6 +18,13 @@ const homeUrl = internalUrl("", import.meta.env.BASE_URL);
 const topicsUrl = internalUrl("#teme", import.meta.env.BASE_URL);
 const reviewUrl = internalUrl("review/", import.meta.env.BASE_URL);
 const aboutUrl = internalUrl("about/", import.meta.env.BASE_URL);
+const manifestUrl = internalUrl("manifest.webmanifest", import.meta.env.BASE_URL);
+const faviconUrl = internalUrl("favicon.svg", import.meta.env.BASE_URL);
+const appleTouchIconUrl = internalUrl("icons/apple-touch-icon.png", import.meta.env.BASE_URL);
+const currentPath = Astro.url.pathname;
+const isHome = currentPath === internalUrl("", import.meta.env.BASE_URL);
+const isTopics = currentPath.startsWith(internalUrl("topics/", import.meta.env.BASE_URL));
+const isReview = currentPath.startsWith(reviewUrl);
 ---
 
 <!doctype html>
@@ -26,6 +34,11 @@ const aboutUrl = internalUrl("about/", import.meta.env.BASE_URL);
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#173f4f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href={manifestUrl} />
+    <link rel="icon" href={faviconUrl} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={appleTouchIconUrl} />
     <title>{pageTitle}</title>
   </head>
   <body>
@@ -46,5 +59,11 @@ const aboutUrl = internalUrl("about/", import.meta.env.BASE_URL);
     <footer class="site-footer">
       <p>Znanje ostane v Git repozitoriju. Osebni napredek bo ostal na napravi.</p>
     </footer>
+    <nav class="mobile-nav" aria-label="Mobilna navigacija">
+      <a href={homeUrl} aria-current={isHome ? "page" : undefined}><span aria-hidden="true">⌂</span> Domov</a>
+      <a href={topicsUrl} aria-current={isTopics ? "page" : undefined}><span aria-hidden="true">▤</span> Teme</a>
+      <a href={reviewUrl} aria-current={isReview ? "page" : undefined}><span aria-hidden="true">🧠</span> Ponovi</a>
+    </nav>
+    {import.meta.env.PROD && <PwaStatus />}
   </body>
 </html>

@@ -44,7 +44,8 @@
     if (root.dataset.ready === "true") continue;
     root.dataset.ready = "true";
 
-    const summary = root.querySelector<HTMLElement>("[data-profile-summary]")!;
+    const summary = root.querySelector<HTMLElement>("summary")!;
+    const summaryLabel = root.querySelector<HTMLElement>("[data-profile-summary]")!;
     const controls = root.querySelector<HTMLElement>("[data-profile-controls]")!;
     const select = root.querySelector<HTMLSelectElement>("[data-profile-select]")!;
     const deleteButton = root.querySelector<HTMLButtonElement>("[data-profile-delete]")!;
@@ -60,7 +61,10 @@
 
     function render(): void {
       const active = getActiveProfile(state);
-      summary.textContent = active?.label ?? "Izberi profil";
+      const label = active?.label ?? "Izberi profil";
+      summaryLabel.textContent = label;
+      summary.title = label;
+      summary.setAttribute("aria-label", active ? `Aktivni profil: ${label}` : label);
       controls.hidden = state.profiles.length === 0;
       select.replaceChildren();
       for (const profile of state.profiles) {
