@@ -1,0 +1,71 @@
+---
+interface Props {
+  topic: string;
+}
+
+const { topic } = Astro.props;
+---
+
+<section class="topic-completion" data-topic-completion data-topic={topic} aria-labelledby="topic-completion-title">
+  <div>
+    <p class="eyebrow">Napredek</p>
+    <h2 id="topic-completion-title">Si prebral zgodbo?</h2>
+    <p data-topic-completion-message>Za shranjevanje napredka izberi profil v glavi strani.</p>
+  </div>
+  <button class="button" type="button" data-topic-completion-button disabled>✓ Tema prebrana</button>
+</section>
+
+<script>
+  import {
+    LEARNING_STATE_EVENT,
+    getActiveProfile,
+    loadLearningState,
+    markTopicLearned,
+    saveLearningState,
+    type LearningStorage,
+  } from "../lib/learning-state";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-topic-completion]")) {
+    if (root.dataset.ready === "true") continue;
+    root.dataset.ready = "true";
+
+    const topic = root.dataset.topic!;
+    const message = root.querySelector<HTMLElement>("[data-topic-completion-message]")!;
+    const button = root.querySelector<HTMLButtonElement>("[data-topic-completion-button]")!;
+    let storage: LearningStorage | undefined;
+    try {
+      storage = window.localStorage;
+    } catch {
+      storage = undefined;
+    }
+
+    function render(): void {
+      const active = getActiveProfile(loadLearningState(storage));
+      const learned = Boolean(active && Object.hasOwn(active.learnedTopics, topic));
+      button.disabled = !active || learned;
+      button.textContent = learned ? "✓ Tema je prebrana" : "✓ Tema prebrana";
+      message.textContent = active
+        ? learned
+          ? `Napredek je shranjen za profil ${active.label}. Vprašanja iz te teme se lahko pojavijo pri ponavljanju.`
+          : `Označi kot prebrano za profil ${active.label}, da bo tema vključena v ponavljanje.`
+        : "Za shranjevanje napredka izberi ali ustvari profil v glavi strani.";
+    }
+
+    button.addEventListener("click", () => {
+      const state = loadLearningState(storage);
+      const active = getActiveProfile(state);
+      if (!active) return;
+      const nextState = markTopicLearned(state, active.id, topic, new Date().toISOString());
+      if (saveLearningState(storage, nextState)) {
+        window.dispatchEvent(new CustomEvent(LEARNING_STATE_EVENT));
+        render();
+      } else {
+        message.textContent = "Brskalnik ne dovoli shranjevanja napredka.";
+      }
+    });
+
+    window.addEventListener(LEARNING_STATE_EVENT, render);
+    window.addEventListener("storage", render);
+    render();
+  }
+</script>

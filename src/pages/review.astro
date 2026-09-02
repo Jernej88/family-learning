@@ -1,0 +1,25 @@
+---
+import { getCollection } from "astro:content";
+
+import DailyReview from "../components/DailyReview.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { internalUrl } from "../lib/internal-url";
+import { getTopicQuiz } from "../lib/topic-quiz";
+import type { ReviewQuestion } from "../lib/review";
+
+const topics = await getCollection("topics", ({ data }) => data.status === "published");
+const questions: ReviewQuestion[] = topics.flatMap((topic) =>
+  getTopicQuiz(topic.data.slug).questions.map((question) => ({
+    topic: topic.data.slug,
+    topicTitle: topic.data.title,
+    question,
+  })),
+);
+const topicsUrl = internalUrl("#teme", import.meta.env.BASE_URL);
+---
+
+<BaseLayout title="Današnji izziv" description="Dnevno ponavljanje vprašanj iz prebranih tem.">
+  <div class="review-page">
+    <DailyReview questions={questions} topicsUrl={topicsUrl} />
+  </div>
+</BaseLayout>

@@ -1,0 +1,288 @@
+---
+import type { ReviewQuestion } from "../lib/review";
+
+interface Props {
+  questions: ReviewQuestion[];
+  topicsUrl: string;
+}
+
+const { questions, topicsUrl } = Astro.props;
+const serializedQuestions = JSON.stringify(questions).replace(/</g, "\\u003c");
+---
+
+<section
+  class="daily-review topic-quiz"
+  data-daily-review
+  data-topics-url={topicsUrl}
+  aria-labelledby="daily-review-title"
+>
+  <script type="application/json" data-review-data set:html={serializedQuestions} is:inline />
+
+  <div data-review-intro>
+    <p class="eyebrow">🧠 Današnji izziv</p>
+    <h1 id="daily-review-title">Pet vprašanj za spomin</h1>
+    <p data-review-intro-message>Izberi profil, da pripravimo vprašanja iz prebranih tem.</p>
+    <button class="button" type="button" data-review-start disabled>Začni ponavljanje</button>
+  </div>
+
+  <div data-review-player hidden>
+    <p class="daily-review__topic" data-review-topic></p>
+    <div class="topic-quiz__progress-row">
+      <p id="review-progress-label" data-review-progress-label></p>
+      <progress data-review-progress max="5" value="0" aria-labelledby="review-progress-label"></progress>
+    </div>
+    <h2 class="topic-quiz__question" data-review-question tabindex="-1"></h2>
+    <div class="topic-quiz__options" data-review-options></div>
+    <div
+      class="topic-quiz__feedback"
+      data-review-feedback
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      tabindex="-1"
+    >
+      <p class="topic-quiz__feedback-title" data-review-feedback-title></p>
+      <p data-review-correction hidden></p>
+      <p data-review-explanation></p>
+    </div>
+    <button class="button topic-quiz__next" type="button" data-review-next hidden>Naslednje vprašanje</button>
+  </div>
+
+  <div data-review-summary hidden>
+    <p class="eyebrow">✓ Ponavljanje končano</p>
+    <h2 data-review-summary-title tabindex="-1"></h2>
+    <p data-review-summary-text></p>
+    <button class="button" type="button" data-review-continue>Še pet vprašanj</button>
+  </div>
+
+  <noscript><p>Za dnevno ponavljanje mora biti v brskalniku omogočen JavaScript.</p></noscript>
+</section>
+
+<script>
+  import {
+    getCorrectAnswerIndex,
+    getQuestionOptions,
+  } from "../lib/quiz-session";
+  import {
+    LEARNING_STATE_EVENT,
+    getActiveProfile,
+    loadLearningState,
+    saveLearningState,
+    setQuestionHistory,
+    type LearningState,
+    type LearningStorage,
+  } from "../lib/learning-state";
+  import {
+    selectDailyQuestions,
+    todayDate,
+    updateQuestionHistory,
+    type ReviewQuestion,
+  } from "../lib/review";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-daily-review]")) {
+    if (root.dataset.ready === "true") continue;
+    root.dataset.ready = "true";
+
+    const data = root.querySelector<HTMLElement>("[data-review-data]")!;
+    const questions = JSON.parse(data.textContent ?? "[]") as ReviewQuestion[];
+    const intro = root.querySelector<HTMLElement>("[data-review-intro]")!;
+    const introMessage = root.querySelector<HTMLElement>("[data-review-intro-message]")!;
+    const startButton = root.querySelector<HTMLButtonElement>("[data-review-start]")!;
+    const player = root.querySelector<HTMLElement>("[data-review-player]")!;
+    const topicLabel = root.querySelector<HTMLElement>("[data-review-topic]")!;
+    const progressLabel = root.querySelector<HTMLElement>("[data-review-progress-label]")!;
+    const progress = root.querySelector<HTMLProgressElement>("[data-review-progress]")!;
+    const questionHeading = root.querySelector<HTMLElement>("[data-review-question]")!;
+    const optionsContainer = root.querySelector<HTMLElement>("[data-review-options]")!;
+    const feedback = root.querySelector<HTMLElement>("[data-review-feedback]")!;
+    const feedbackTitle = root.querySelector<HTMLElement>("[data-review-feedback-title]")!;
+    const correction = root.querySelector<HTMLElement>("[data-review-correction]")!;
+    const explanation = root.querySelector<HTMLElement>("[data-review-explanation]")!;
+    const nextButton = root.querySelector<HTMLButtonElement>("[data-review-next]")!;
+    const summary = root.querySelector<HTMLElement>("[data-review-summary]")!;
+    const summaryTitle = root.querySelector<HTMLElement>("[data-review-summary-title]")!;
+    const summaryText = root.querySelector<HTMLElement>("[data-review-summary-text]")!;
+    const continueButton = root.querySelector<HTMLButtonElement>("[data-review-continue]")!;
+
+    let storage: LearningStorage | undefined;
+    try {
+      storage = window.localStorage;
+    } catch {
+      storage = undefined;
+    }
+    let state: LearningState = loadLearningState(storage);
+    let activeProfileId = state.activeProfileId;
+    let batch: ReviewQuestion[] = [];
+    let currentIndex = 0;
+    let selectedIndex: number | undefined;
+    let correctAnswers = 0;
+    let storageFailed = false;
+    const seenQuestionIds = new Set<string>();
+
+    function availableQuestions(): ReviewQuestion[] {
+      const profile = getActiveProfile(state);
+      return profile
+        ? selectDailyQuestions(questions, profile, {
+            excludeQuestionIds: seenQuestionIds,
+          })
+        : [];
+    }
+
+    function renderIntro(): void {
+      state = loadLearningState(storage);
+      const profile = getActiveProfile(state);
+      const available = availableQuestions();
+      intro.hidden = false;
+      player.hidden = true;
+      summary.hidden = true;
+      startButton.disabled = available.length === 0;
+      startButton.textContent = available.length > 0
+        ? `Začni (${available.length} ${available.length === 1 ? "vprašanje" : "vprašanj"})`
+        : "Začni ponavljanje";
+      const topicsLink = root.dataset.topicsUrl ?? "#";
+      introMessage.innerHTML = profile
+        ? available.length > 0
+          ? `Za profil <strong>${escapeHtml(profile.label)}</strong> smo pripravili vprašanja iz prebranih tem.`
+          : `Za profil <strong>${escapeHtml(profile.label)}</strong> še ni primernih vprašanj. ` +
+            `<a href="${topicsLink}">Najprej preberi in označi temo.</a>`
+        : "Izberi ali ustvari profil v glavi strani, nato označi prebrano temo.";
+    }
+
+    function startBatch(): void {
+      state = loadLearningState(storage);
+      activeProfileId = state.activeProfileId;
+      batch = availableQuestions();
+      if (batch.length === 0) {
+        renderIntro();
+        return;
+      }
+      currentIndex = 0;
+      selectedIndex = undefined;
+      correctAnswers = 0;
+      storageFailed = false;
+      intro.hidden = true;
+      summary.hidden = true;
+      player.hidden = false;
+      renderQuestion(true);
+    }
+
+    function renderQuestion(moveFocus = false): void {
+      const current = batch[currentIndex];
+      const question = current.question;
+      const options = getQuestionOptions(question);
+      const correctIndex = getCorrectAnswerIndex(question);
+      topicLabel.textContent = current.topicTitle;
+      progress.max = batch.length;
+      progress.value = currentIndex + (selectedIndex === undefined ? 0 : 1);
+      progressLabel.textContent = `Vprašanje ${currentIndex + 1} od ${batch.length}`;
+      questionHeading.textContent = question.question;
+      optionsContainer.replaceChildren();
+
+      options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "topic-quiz__option";
+        button.disabled = selectedIndex !== undefined;
+        button.setAttribute("aria-pressed", selectedIndex === index ? "true" : "false");
+        const marker = document.createElement("span");
+        marker.textContent = String.fromCharCode(65 + index);
+        marker.setAttribute("aria-hidden", "true");
+        button.append(marker, document.createTextNode(option));
+        if (selectedIndex === index) {
+          button.classList.add(index === correctIndex ? "is-correct" : "is-incorrect");
+        } else if (selectedIndex !== undefined && index === correctIndex) {
+          button.classList.add("is-correct");
+        }
+        button.addEventListener("click", () => answer(index));
+        optionsContainer.append(button);
+      });
+
+      const answered = selectedIndex !== undefined;
+      feedback.classList.toggle("is-active", answered);
+      nextButton.hidden = !answered;
+      if (answered) {
+        const isCorrect = selectedIndex === correctIndex;
+        feedbackTitle.textContent = isCorrect ? "✓ Pravilen odgovor!" : "Ni čisto.";
+        correction.hidden = isCorrect;
+        correction.textContent = isCorrect ? "" : `Pravilen odgovor je: ${options[correctIndex]}.`;
+        explanation.textContent = question.explanation;
+        nextButton.textContent = currentIndex === batch.length - 1 ? "Pokaži rezultat" : "Naslednje vprašanje";
+      } else {
+        feedbackTitle.textContent = "";
+        correction.hidden = true;
+        correction.textContent = "";
+        explanation.textContent = "";
+      }
+      if (moveFocus) questionHeading.focus();
+    }
+
+    function answer(index: number): void {
+      if (selectedIndex !== undefined || !activeProfileId) return;
+      const current = batch[currentIndex];
+      const correct = index === getCorrectAnswerIndex(current.question);
+      selectedIndex = index;
+      correctAnswers += correct ? 1 : 0;
+      const profile = getActiveProfile(state);
+      if (profile?.id === activeProfileId) {
+        const history = updateQuestionHistory(
+          profile.questionHistory[current.question.id],
+          current.question.id,
+          correct,
+          todayDate(),
+        );
+        const nextState = setQuestionHistory(state, activeProfileId, history);
+        if (saveLearningState(storage, nextState)) {
+          state = nextState;
+          window.dispatchEvent(new CustomEvent(LEARNING_STATE_EVENT));
+        } else {
+          storageFailed = true;
+        }
+      }
+      renderQuestion();
+      feedback.focus();
+    }
+
+    function finishBatch(): void {
+      for (const item of batch) seenQuestionIds.add(item.question.id);
+      player.hidden = true;
+      summary.hidden = false;
+      summaryTitle.textContent = `${correctAnswers} od ${batch.length} pravilno`;
+      summaryText.textContent = storageFailed
+        ? "Odgovorov ni bilo mogoče shraniti. Preveri nastavitve shranjevanja v brskalniku."
+        : "Vsak odgovor je posodobil tvoj osebni urnik ponavljanja.";
+      state = loadLearningState(storage);
+      continueButton.hidden = availableQuestions().length === 0;
+      summaryTitle.focus();
+    }
+
+    startButton.addEventListener("click", startBatch);
+    nextButton.addEventListener("click", () => {
+      if (selectedIndex === undefined) return;
+      if (currentIndex === batch.length - 1) {
+        finishBatch();
+        return;
+      }
+      currentIndex += 1;
+      selectedIndex = undefined;
+      renderQuestion(true);
+    });
+    continueButton.addEventListener("click", startBatch);
+    window.addEventListener(LEARNING_STATE_EVENT, () => {
+      const nextState = loadLearningState(storage);
+      if (nextState.activeProfileId !== activeProfileId && !player.hidden) {
+        seenQuestionIds.clear();
+        renderIntro();
+      } else {
+        state = nextState;
+        if (!intro.hidden) renderIntro();
+      }
+    });
+    renderIntro();
+  }
+
+  function escapeHtml(value: string): string {
+    const element = document.createElement("span");
+    element.textContent = value;
+    return element.innerHTML;
+  }
+</script>

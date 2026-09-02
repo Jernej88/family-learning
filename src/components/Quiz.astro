@@ -74,6 +74,14 @@ const serializedQuiz = JSON.stringify(quiz).replace(/</g, "\\u003c");
     saveQuizSession,
     type QuizStorage,
   } from "../lib/quiz-storage";
+  import {
+    LEARNING_STATE_EVENT,
+    getActiveProfile,
+    loadLearningState,
+    saveLearningState,
+    setQuestionHistory,
+  } from "../lib/learning-state";
+  import { todayDate, updateQuestionHistory } from "../lib/review";
 
   for (const root of document.querySelectorAll<HTMLElement>("[data-topic-quiz]")) {
     if (root.dataset.ready === "true") continue;
@@ -163,8 +171,26 @@ const serializedQuiz = JSON.stringify(quiz).replace(/</g, "\\u003c");
         }
 
         button.addEventListener("click", () => {
+          const previousAnswer = session!.answers[question.id];
           session = answerCurrentQuestion(session!, question, index);
           saveQuizSession(storage, session);
+          const answer = session.answers[question.id];
+          if (!previousAnswer && answer) {
+            const learningState = loadLearningState(storage);
+            const profile = getActiveProfile(learningState);
+            if (profile) {
+              const history = updateQuestionHistory(
+                profile.questionHistory[question.id],
+                question.id,
+                answer.correct,
+                todayDate(),
+              );
+              const nextLearningState = setQuestionHistory(learningState, profile.id, history);
+              if (saveLearningState(storage, nextLearningState)) {
+                window.dispatchEvent(new CustomEvent(LEARNING_STATE_EVENT));
+              }
+            }
+          }
           renderSession();
           feedback.focus();
         });

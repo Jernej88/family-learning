@@ -134,6 +134,94 @@ ol {
   text-decoration: none;
 }
 
+.profile-picker {
+  position: relative;
+}
+
+.profile-picker > summary {
+  min-width: 7rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 80%);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  list-style: none;
+}
+
+.profile-picker > summary::-webkit-details-marker {
+  display: none;
+}
+
+.profile-picker__panel {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  width: min(20rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.profile-picker__panel label,
+.profile-picker__form-title {
+  display: block;
+  margin: 0.7rem 0 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.profile-picker__panel select,
+.profile-picker__panel input {
+  width: 100%;
+  min-height: 2.7rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #abc7c6;
+  border-radius: 0.6rem;
+  color: var(--ink);
+  background: white;
+  font: inherit;
+}
+
+.profile-picker__form {
+  margin-top: 1rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--line);
+}
+
+.profile-picker__form-title {
+  color: var(--teal-dark);
+}
+
+.profile-picker__status {
+  min-height: 1.4rem;
+  margin: 0.7rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.text-button {
+  padding: 0;
+  border: 0;
+  color: var(--teal-dark);
+  background: transparent;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.text-button--danger {
+  margin-top: 0.7rem;
+  color: #8a3f2c;
+}
+
 .site-footer {
   padding-block: 2.5rem;
   border-top: 1px solid var(--line);
@@ -180,12 +268,28 @@ ol {
   align-items: center;
   justify-content: center;
   padding: 0.72rem 1.25rem;
+  border: 0;
   border-radius: 999px;
   color: white;
   background: var(--teal-dark);
   box-shadow: 0 8px 24px rgb(16 77 83 / 18%);
+  font: inherit;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
+}
+
+.button--small {
+  min-height: 2.6rem;
+  margin-top: 0.9rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.86rem;
+}
+
+.button:disabled {
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .home-hero__orbit {
@@ -211,6 +315,29 @@ ol {
 
 .topic-list {
   padding-block: 4rem 7rem;
+}
+
+.daily-challenge {
+  display: flex;
+  width: min(1180px, calc(100% - 2rem));
+  align-items: center;
+  justify-content: space-between;
+  margin-inline: auto;
+  padding: clamp(1.4rem, 5vw, 2.3rem);
+  gap: 2rem;
+  border: 1px solid #9ac8bd;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--teal-pale), white 75%);
+  box-shadow: var(--shadow);
+}
+
+.daily-challenge h2,
+.daily-challenge p:last-child {
+  margin-bottom: 0;
+}
+
+.daily-challenge p:last-child {
+  color: var(--ink-soft);
 }
 
 .section-heading {
@@ -651,6 +778,53 @@ ol {
   margin-top: 1.25rem;
 }
 
+.topic-completion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4rem;
+  padding: clamp(1.2rem, 4vw, 1.8rem);
+  gap: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.topic-completion h2 {
+  margin-bottom: 0.35rem;
+  font-size: 1.4rem;
+}
+
+.topic-completion p:last-child {
+  margin-bottom: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.review-page {
+  width: min(780px, calc(100% - 2rem));
+  min-height: calc(100vh - 12rem);
+  margin-inline: auto;
+  padding-block: clamp(3rem, 10vw, 6rem);
+}
+
+.daily-review {
+  margin-top: 0;
+}
+
+.daily-review h1 {
+  font-size: clamp(2rem, 7vw, 3.4rem);
+}
+
+.daily-review__topic {
+  margin-bottom: 0.4rem;
+  color: var(--teal);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .plain-page {
   max-width: 760px;
   padding-block: clamp(4rem, 12vw, 8rem);
@@ -668,13 +842,28 @@ ol {
 
   .site-header {
     align-items: flex-start;
+    flex-wrap: wrap;
     padding-block: 1rem;
   }
 
   .site-header nav {
+    margin-left: auto;
+    gap: 0.7rem;
+    font-size: 0.88rem;
+  }
+
+  .profile-picker {
+    width: 100%;
+  }
+
+  .profile-picker > summary {
+    margin-left: auto;
+  }
+
+  .daily-challenge,
+  .topic-completion {
+    align-items: stretch;
     flex-direction: column;
-    gap: 0.2rem;
-    text-align: right;
   }
 
   .home-hero {
