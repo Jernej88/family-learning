@@ -3,10 +3,12 @@ import { getCollection } from "astro:content";
 
 import TopicCard from "../components/TopicCard.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { internalUrl } from "../lib/internal-url";
 
 const topics = (await getCollection("topics", ({ data }) => data.status === "published")).sort(
   (left, right) => right.data.last_updated.valueOf() - left.data.last_updated.valueOf(),
 );
+const reviewUrl = internalUrl("review/", import.meta.env.BASE_URL);
 ---
 
 <BaseLayout>
@@ -24,6 +26,15 @@ const topics = (await getCollection("topics", ({ data }) => data.status === "pub
       <span class="home-hero__earth">🌍</span>
       <span class="home-hero__moon">🌙</span>
     </div>
+  </section>
+
+  <section class="daily-challenge" aria-labelledby="daily-challenge-title">
+    <div>
+      <p class="eyebrow">🧠 Današnji izziv</p>
+      <h2 id="daily-challenge-title">Kaj je ostalo v spominu?</h2>
+      <p>Pet kratkih vprašanj iz tem, ki si jih že prebral. Vsak profil ima svoj napredek.</p>
+    </div>
+    <a class="button" href={reviewUrl}>Začni ponavljanje</a>
   </section>
 
   <section class="topic-list" id="teme" aria-labelledby="topics-title">
@@ -46,4 +57,3 @@ const topics = (await getCollection("topics", ({ data }) => data.status === "pub
     </div>
   </section>
 </BaseLayout>
-

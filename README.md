@@ -11,15 +11,17 @@ Permanent knowledge therefore lives in Git as MDX and JSON. Astro builds it into
 
 ## Current scope
 
-Milestones 1–3 provide the interactive-story foundation, content contract, and topic quiz:
+Milestones 1–4 provide the interactive-story foundation, content contract, topic quiz, and daily recall:
 
 - a mobile-first Astro + MDX topic library;
 - nine reusable learning components;
 - validated topic metadata and reusable quiz data;
 - a five-question topic quiz with immediate explanations and device-local progress;
+- device-local profiles with independent learned-topic and question history;
+- a transparent spaced-repetition schedule and five-question daily challenge;
 - one complete topic, `Zakaj Luna ne pade na Zemljo?`.
 
-Profiles, learned-topic history, spaced recall, PWA support, and deployment belong to later milestones. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
+PWA support, deployment, and automated knowledge maintenance belong to later milestones. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
 
 ## Run locally
 
@@ -60,3 +62,5 @@ npm run build
 4. Run `npm run validate`; the homepage and route are generated automatically.
 
 Content should contain no child names, photos, birthdays, or learning results. AI may help research and author a proposal, but a parent reviews it before publication.
+
+Profiles and learning history are saved only in the current browser. They are not synchronized between devices; deleting a profile permanently removes its local progress.

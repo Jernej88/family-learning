@@ -1,0 +1,126 @@
+<details class="profile-picker" data-profile-picker>
+  <summary><span aria-hidden="true">👤</span> <span data-profile-summary>Izberi profil</span></summary>
+  <div class="profile-picker__panel">
+    <div data-profile-controls hidden>
+      <label for="active-learning-profile">Aktivni profil</label>
+      <select id="active-learning-profile" data-profile-select></select>
+      <button class="text-button text-button--danger" type="button" data-profile-delete>
+        Izbriši aktivni profil
+      </button>
+    </div>
+
+    <form class="profile-picker__form" data-profile-form>
+      <p class="profile-picker__form-title">Nov profil</p>
+      <label for="new-profile-label">Oznaka</label>
+      <input id="new-profile-label" name="label" maxlength="30" placeholder="npr. Otrok 1" required />
+      <label for="new-profile-age">Približna starost</label>
+      <select id="new-profile-age" name="age">
+        {
+          Array.from({ length: 14 }, (_, index) => index + 5).map((age) => (
+            <option value={age} selected={age === 7}>{age} let</option>
+          ))
+        }
+      </select>
+      <button class="button button--small" type="submit">Ustvari profil</button>
+    </form>
+    <p class="profile-picker__status" data-profile-status role="status" aria-live="polite"></p>
+  </div>
+</details>
+
+<script>
+  import {
+    LEARNING_STATE_EVENT,
+    addProfile,
+    deleteProfile,
+    getActiveProfile,
+    loadLearningState,
+    saveLearningState,
+    selectProfile,
+    type LearningState,
+    type LearningStorage,
+  } from "../lib/learning-state";
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-profile-picker]")) {
+    if (root.dataset.ready === "true") continue;
+    root.dataset.ready = "true";
+
+    const summary = root.querySelector<HTMLElement>("[data-profile-summary]")!;
+    const controls = root.querySelector<HTMLElement>("[data-profile-controls]")!;
+    const select = root.querySelector<HTMLSelectElement>("[data-profile-select]")!;
+    const deleteButton = root.querySelector<HTMLButtonElement>("[data-profile-delete]")!;
+    const form = root.querySelector<HTMLFormElement>("[data-profile-form]")!;
+    const status = root.querySelector<HTMLElement>("[data-profile-status]")!;
+    let storage: LearningStorage | undefined;
+    try {
+      storage = window.localStorage;
+    } catch {
+      storage = undefined;
+    }
+    let state = loadLearningState(storage);
+
+    function render(): void {
+      const active = getActiveProfile(state);
+      summary.textContent = active?.label ?? "Izberi profil";
+      controls.hidden = state.profiles.length === 0;
+      select.replaceChildren();
+      for (const profile of state.profiles) {
+        const option = document.createElement("option");
+        option.value = profile.id;
+        option.textContent = `${profile.label} · ${profile.age} let`;
+        option.selected = profile.id === state.activeProfileId;
+        select.append(option);
+      }
+    }
+
+    function persist(nextState: LearningState, message: string): void {
+      if (!saveLearningState(storage, nextState)) {
+        status.textContent = "Brskalnik ne dovoli shranjevanja napredka.";
+        return;
+      }
+      state = nextState;
+      status.textContent = message;
+      render();
+      window.dispatchEvent(new CustomEvent(LEARNING_STATE_EVENT));
+    }
+
+    select.addEventListener("change", () => {
+      persist(selectProfile(state, select.value), "Profil je izbran.");
+    });
+
+    deleteButton.addEventListener("click", () => {
+      const active = getActiveProfile(state);
+      if (!active || !window.confirm(`Izbrišem profil »${active.label}« in ves njegov napredek?`)) return;
+      persist(deleteProfile(state, active.id), "Profil in njegov napredek sta izbrisana.");
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const label = String(data.get("label") ?? "");
+      const age = Number(data.get("age"));
+      const id = `profile-${crypto.randomUUID()}`;
+      const nextState = addProfile(state, {
+        id,
+        label,
+        age,
+        createdAt: new Date().toISOString(),
+      });
+      if (nextState === state) {
+        status.textContent = "Vnesi kratko oznako in veljavno starost.";
+        return;
+      }
+      form.reset();
+      persist(nextState, "Profil je ustvarjen in izbran.");
+    });
+
+    window.addEventListener(LEARNING_STATE_EVENT, () => {
+      state = loadLearningState(storage);
+      render();
+    });
+    window.addEventListener("storage", () => {
+      state = loadLearningState(storage);
+      render();
+    });
+    render();
+  }
+</script>

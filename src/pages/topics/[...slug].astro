@@ -2,6 +2,7 @@
 import { getCollection, render, type CollectionEntry } from "astro:content";
 
 import Quiz from "../../components/Quiz.astro";
+import TopicCompletion from "../../components/TopicCompletion.astro";
 import TopicLayout from "../../layouts/TopicLayout.astro";
 import type { Quiz as QuizData } from "../../lib/content-schema";
 import { getTopicQuiz } from "../../lib/topic-quiz";
@@ -25,5 +26,6 @@ const { Content } = await render(topic);
 
 <TopicLayout {...topic.data}>
   <Content />
+  <TopicCompletion topic={topic.data.slug} />
   <Quiz quiz={quiz} />
 </TopicLayout>
