@@ -1,0 +1,110 @@
+name: Knowledge review due
+
+on:
+  schedule:
+    - cron: "15 6 * * *"
+  workflow_dispatch:
+    inputs:
+      today:
+        description: Optional UTC evaluation date (YYYY-MM-DD) for a manual check
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: knowledge-review
+  cancel-in-progress: false
+
+jobs:
+  review-due:
+    runs-on: ubuntu-latest
+    env:
+      REVIEW_DATE: ${{ github.event.inputs.today }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Calculate review queue
+        run: node_modules/.bin/tsx scripts/generate-review-issue.ts --output "$RUNNER_TEMP/review-issue.json"
+
+      - name: Update knowledge-review issue
+        uses: actions/github-script@v8
+        env:
+          REVIEW_ISSUE_PATH: ${{ runner.temp }}/review-issue.json
+        with:
+          script: |
+            const fs = require("node:fs");
+            const payload = JSON.parse(fs.readFileSync(process.env.REVIEW_ISSUE_PATH, "utf8"));
+            const title = "Knowledge review due";
+            const label = "knowledge-review";
+            const { owner, repo } = context.repo;
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: label });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: label,
+                color: "1d76db",
+                description: "Published topics due for factual review",
+              });
+            }
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: "open",
+              labels: label,
+              per_page: 100,
+            });
+            const existing = issues.find((issue) => issue.title === title);
+
+            if (payload.dueReviews.length === 0) {
+              if (existing) {
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  state: "closed",
+                });
+                core.info(`Closed #${existing.number}; no topics are due.`);
+              } else {
+                core.info("No topics are due.");
+              }
+              return;
+            }
+
+            if (existing) {
+              if (existing.body !== payload.body) {
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  body: payload.body,
+                });
+                core.info(`Updated #${existing.number}.`);
+              } else {
+                core.info(`Issue #${existing.number} is already current.`);
+              }
+            } else {
+              const { data: issue } = await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body: payload.body,
+                labels: [label],
+              });
+              core.info(`Created #${issue.number}.`);
+            }

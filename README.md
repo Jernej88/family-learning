@@ -21,7 +21,7 @@ Milestones 1–4 provide the interactive-story foundation, content contract, top
 - a transparent spaced-repetition schedule and five-question daily challenge;
 - one complete topic, `Zakaj Luna ne pade na Zemljo?`.
 
-Milestone 5 adds installable PWA support: the published application has home-screen icons, an offline-capable cache of its generated content, and mobile app navigation. Milestone 6 validates every change in GitHub Actions and deploys valid changes merged to `main` to GitHub Pages. Automated knowledge maintenance remains a later milestone. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
+Milestone 5 adds installable PWA support: the published application has home-screen icons, an offline-capable cache of its generated content, and mobile app navigation. Milestone 6 validates every change in GitHub Actions and deploys valid changes merged to `main` to GitHub Pages. Milestone 7 maintains a daily GitHub Issue review queue for published topics whose factual verification is due. See [the V1 design](docs/design-v1.md#64-suggested-implementation-milestones) for the roadmap.
 
 ## Run locally
 
@@ -58,6 +58,7 @@ Before the first deployment, configure the repository in **Settings → Pages �
 | `src/content.config.ts` | Astro topic collection |
 | `src/lib/content-schema.ts` | Topic and quiz contracts |
 | `scripts/validate-content.ts` | Cross-file and story acceptance checks |
+| `review-feed.json` | Committed factual-review metadata for published topics |
 | `docs/topic-authoring.md` | How to research and add a topic |
 | `docs/design-v1.md` | Product and architecture source of truth |
 

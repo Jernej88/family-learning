@@ -12,7 +12,9 @@
     "build": "astro build && tsx scripts/generate-pwa.ts",
     "check": "astro check",
     "validate:content": "tsx scripts/validate-content.ts",
-    "validate": "npm run check && npm run validate:content",
+    "generate:review-feed": "tsx scripts/generate-review-feed.ts",
+    "validate:review-feed": "tsx scripts/generate-review-feed.ts --check",
+    "validate": "npm run check && npm run validate:content && npm run validate:review-feed",
     "test": "vitest run",
     "test:root-build": "BASE_PATH=/ SITE_URL=https://example.test npm run build && BASE_PATH=/ SITE_URL=https://example.test tsx scripts/validate-subpath-build.ts",
     "test:subpath": "npm run build && tsx scripts/validate-subpath-build.ts"

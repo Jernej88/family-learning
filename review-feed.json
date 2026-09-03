@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "topics": [
+    {
+      "slug": "zakaj-luna-ne-pade-na-zemljo",
+      "title": "Zakaj Luna ne pade na Zemljo?",
+      "stability": "stable",
+      "last_verified": "2026-09-01",
+      "review_interval_days": 365
+    }
+  ]
+}
