@@ -62,7 +62,11 @@ for (const directory of topicDirectories) {
     continue;
   }
 
-  const quizResult = validateQuiz(quizInput, slug);
+  const quizResult = validateQuiz(
+    quizInput,
+    slug,
+    topicResult.success ? topicResult.data.audience : undefined,
+  );
   for (const message of quizResult.errors) report(quizFile, message);
 
   if (topicResult.success && topicResult.data.status === "published" && quizResult.data) {
@@ -88,4 +92,3 @@ if (errors.length > 0) {
 } else {
   console.log(`Validated ${topicDirectories.length} topic bundle(s).`);
 }
-

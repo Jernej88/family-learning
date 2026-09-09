@@ -6,15 +6,17 @@ interface Props {
   slug: string;
   description: string;
   category: string;
+  audience: "child" | "adult";
   estimatedMinutes: number;
 }
 
-const { title, slug, description, category, estimatedMinutes } = Astro.props;
+const { title, slug, description, category, audience, estimatedMinutes } = Astro.props;
 const topicUrl = internalUrl(`topics/${slug}/`, import.meta.env.BASE_URL);
+const audienceLabel = audience === "child" ? "Za otroke" : "Za odrasle";
 ---
 
 <article class="topic-card">
-  <p class="topic-card__meta">{category} · {estimatedMinutes} min</p>
+  <p class="topic-card__meta">{audienceLabel} · {category} · {estimatedMinutes} min</p>
   <h2><a href={topicUrl}>{title}</a></h2>
   <p>{description}</p>
   <a class="topic-card__action" href={topicUrl}>Začni raziskovati <span aria-hidden="true">→</span></a>

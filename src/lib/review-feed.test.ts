@@ -3,13 +3,16 @@ import { describe, expect, it } from "vitest";
 import type { Topic } from "./content-schema";
 import { createReviewFeed } from "./review-feed";
 
-function topic(overrides: Partial<Topic>): Topic {
+type ChildTopic = Extract<Topic, { audience: "child" }>;
+
+function topic(overrides: Partial<ChildTopic>): ChildTopic {
   return {
     title: "Topic",
     slug: "topic",
     description: "A sufficiently long topic description.",
     category: "vesolje",
     tags: ["tema"],
+    audience: "child",
     created: new Date("2026-01-01T00:00:00.000Z"),
     last_updated: new Date("2026-01-01T00:00:00.000Z"),
     last_verified: new Date("2026-01-01T00:00:00.000Z"),
