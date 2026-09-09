@@ -65,14 +65,14 @@ jobs:
             const { data: issues } = await github.rest.issues.listForRepo({
               owner,
               repo,
-              state: "open",
+              state: "all",
               labels: label,
               per_page: 100,
             });
             const existing = issues.find((issue) => issue.title === title);
 
             if (payload.dueReviews.length === 0) {
-              if (existing) {
+              if (existing && existing.state !== "closed") {
                 await github.rest.issues.update({
                   owner,
                   repo,
@@ -87,12 +87,13 @@ jobs:
             }
 
             if (existing) {
-              if (existing.body !== payload.body) {
+              if (existing.state !== "open" || existing.body !== payload.body) {
                 await github.rest.issues.update({
                   owner,
                   repo,
                   issue_number: existing.number,
                   body: payload.body,
+                  state: "open",
                 });
                 core.info(`Updated #${existing.number}.`);
               } else {
