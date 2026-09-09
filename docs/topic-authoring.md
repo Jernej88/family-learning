@@ -94,5 +94,20 @@ For `true_false`, omit `options` and use a boolean `correct`. IDs must be unique
 1. Research claims against the source policy in [design §20](design-v1.md#20-source-policy).
 2. Draft the story, interactions, parent caveats, and quiz.
 3. Set `status: draft` while reviewing factual accuracy, Slovenian clarity, safety, and source quality.
-4. Set `status: published` and run `npm run validate`, `npm test`, and `npm run build`.
-5. Submit for human review; generated educational content is never published automatically.
+4. Set `status: published`, run `npm run generate:review-feed`, and commit the updated `review-feed.json` with the topic.
+5. Run `npm run validate`, `npm test`, and `npm run build`.
+6. Submit for human review; generated educational content is never published automatically.
+
+Published topics appear in the daily GitHub **Knowledge review due** issue when
+`last_verified + review_interval_days` is today or earlier. After a parent has
+reviewed a topic against its sources, update `last_verified`, regenerate the
+review feed, and commit both changes. Draft topics do not enter the review feed
+or maintenance queue.
+
+Use the interval that matches how likely the topic is to change:
+
+| Stability | Typical review interval |
+|---|---:|
+| `stable` | 365 days |
+| `developing` | 60–90 days |
+| `changing` | 7–30 days |
