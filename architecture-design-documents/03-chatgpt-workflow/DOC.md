@@ -698,4 +698,5 @@ clearly separates both audiences.
   branches, visible audience grouping and labels, adult-topic isolation from
   child progress and recall, complete root/subpath checks, and a clean
   independent review. Tracking: [GitHub issue #10](https://github.com/Jernej88/family-learning/issues/10);
-  pull request pending. Notion tracking was explicitly omitted.
+  [pull request #11](https://github.com/Jernej88/family-learning/pull/11).
+  Notion tracking was explicitly omitted.
