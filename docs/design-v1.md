@@ -1587,8 +1587,9 @@ Parent can then invoke Work:
 This notification-only boundary remains the V1 behavior. A post-V1 extension
 may automate the research and repository-editing steps while preserving human
 publication approval. In that extension, a cloud ChatGPT Scheduled Task reads
-the deterministic review queue, researches one due topic, and opens a draft PR
-through the GitHub plugin. It must never merge or publish automatically. See the
+the deterministic review queue, researches every actionable due topic, and opens
+one batch draft PR through the GitHub plugin. It must never merge or publish
+automatically. See the
 [automated knowledge-review proposal design](../architecture-design-documents/02-automated-knowledge-review-proposals/DOC.md).
 
 ---
@@ -2402,17 +2403,17 @@ Implement the optional extension defined in the
 
 - a cloud ChatGPT Scheduled Task;
 - GitHub plugin access restricted to this repository;
-- authoritative-source research for the oldest unclaimed due topic;
+- authoritative-source research for every actionable due topic;
 - verification-only or whole-story-and-quiz update proposals;
-- one draft PR per topic with source evidence and deduplication;
+- one batch draft PR containing all successfully reviewed due topics;
 - blocked-review reporting without advancing `last_verified`; and
 - mandatory human review and merge before deployment.
 
 Success criterion:
 
-A due topic automatically receives one evidence-backed draft PR, or one clear
-blocked-review report, without duplicate proposals or any unattended merge or
-publication.
+Every actionable due topic is handled in one evidence-backed batch draft PR, or
+receives one clear blocked-review report, without overlapping proposals or any
+unattended merge or publication.
 
 This milestone is not required for V1 acceptance.
 
