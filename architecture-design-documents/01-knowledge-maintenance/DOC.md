@@ -181,6 +181,9 @@ external integration and are out of V1 scope.
 
 An optional ChatGPT task may identify meaningful developments in changing
 topics. It complements but does not replace this deterministic review queue.
+The post-V1 design for turning those findings into human-reviewed draft PRs is
+defined in
+[`02-automated-knowledge-review-proposals`](../02-automated-knowledge-review-proposals/DOC.md).
 
 ## 10. Implementation Plan
 
