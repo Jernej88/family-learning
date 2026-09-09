@@ -1548,7 +1548,7 @@ Avoid creating dozens of individual issues unnecessarily.
 
 ---
 
-# 43. Optional ChatGPT Scheduled Task
+# 43. Optional V1 ChatGPT Scheduled Task
 
 ChatGPT Scheduled Tasks complement GitHub Actions.
 
@@ -1583,6 +1583,13 @@ This topic should be updated.
 Parent can then invoke Work:
 
 > Posodobi to temo.
+
+This notification-only boundary remains the V1 behavior. A post-V1 extension
+may automate the research and repository-editing steps while preserving human
+publication approval. In that extension, a cloud ChatGPT Scheduled Task reads
+the deterministic review queue, researches one due topic, and opens a draft PR
+through the GitHub plugin. It must never merge or publish automatically. See the
+[automated knowledge-review proposal design](../architecture-design-documents/02-automated-knowledge-review-proposals/DOC.md).
 
 ---
 
@@ -2385,6 +2392,29 @@ The parent can ask ChatGPT for a new topic and receive files that:
 - use the supported primitives appropriately;
 - contain at least three meaningful interactions;
 - pass repository validation without manual restructuring.
+
+---
+
+## Milestone 9 — Automated knowledge-review proposals (post-V1)
+
+Implement the optional extension defined in the
+[automated knowledge-review proposal design](../architecture-design-documents/02-automated-knowledge-review-proposals/DOC.md):
+
+- a cloud ChatGPT Scheduled Task;
+- GitHub plugin access restricted to this repository;
+- authoritative-source research for the oldest unclaimed due topic;
+- verification-only or whole-story-and-quiz update proposals;
+- one draft PR per topic with source evidence and deduplication;
+- blocked-review reporting without advancing `last_verified`; and
+- mandatory human review and merge before deployment.
+
+Success criterion:
+
+A due topic automatically receives one evidence-backed draft PR, or one clear
+blocked-review report, without duplicate proposals or any unattended merge or
+publication.
+
+This milestone is not required for V1 acceptance.
 
 ---
 
