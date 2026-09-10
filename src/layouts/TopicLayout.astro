@@ -2,21 +2,34 @@
 import BaseLayout from "./BaseLayout.astro";
 import { internalUrl } from "../lib/internal-url";
 
-interface Props {
+interface BaseProps {
   title: string;
   description: string;
   category: string;
   estimated_minutes: number;
-  recommended_age_min: number;
-  recommended_age_max: number;
   last_verified: Date;
   sources: Array<{ title: string; url: string; language: string }>;
 }
+
+type Props = BaseProps &
+  (
+    | {
+        audience: "child";
+        recommended_age_min: number;
+        recommended_age_max: number;
+      }
+    | {
+        audience: "adult";
+        recommended_age_min?: never;
+        recommended_age_max?: never;
+      }
+  );
 
 const {
   title,
   description,
   category,
+  audience,
   estimated_minutes,
   recommended_age_min,
   recommended_age_max,
@@ -25,13 +38,16 @@ const {
 } = Astro.props;
 const verifiedDate = new Intl.DateTimeFormat("sl-SI", { dateStyle: "long" }).format(last_verified);
 const topicsUrl = internalUrl("#teme", import.meta.env.BASE_URL);
+const audienceLabel = audience === "child" ? "Za otroke" : "Za odrasle";
+const ageLabel =
+  audience === "child" ? ` · ${recommended_age_min}–${recommended_age_max} let` : "";
 ---
 
 <BaseLayout title={title} description={description}>
   <article class="topic-shell">
     <header class="topic-hero">
       <a class="back-link" href={topicsUrl}>← Vse teme</a>
-      <p class="topic-hero__meta">{category} · {estimated_minutes} min · {recommended_age_min}–{recommended_age_max} let</p>
+      <p class="topic-hero__meta">{audienceLabel} · {category} · {estimated_minutes} min{ageLabel}</p>
       <h1>{title}</h1>
       <p class="topic-hero__description">{description}</p>
     </header>

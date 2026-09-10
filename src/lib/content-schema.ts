@@ -16,26 +16,42 @@ export const dateOnlySchema = z
   }, "must be a valid calendar date")
   .transform((value) => new Date(`${value}T00:00:00.000Z`));
 
+const topicFields = {
+  title: z.string().min(1),
+  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  description: z.string().min(20).max(180),
+  category: z.string().min(1),
+  tags: z.array(z.string().min(1)).min(1),
+  created: dateOnlySchema,
+  last_updated: dateOnlySchema,
+  last_verified: dateOnlySchema,
+  stability: z.enum(["stable", "developing", "changing"]),
+  review_interval_days: z.number().int().positive(),
+  estimated_minutes: z.number().int().positive().max(60),
+  status: z.enum(["draft", "published"]),
+  sources: z.array(sourceSchema).min(1).max(8),
+};
+
 export const topicSchema = z
-  .object({
-    title: z.string().min(1),
-    slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-    description: z.string().min(20).max(180),
-    category: z.string().min(1),
-    tags: z.array(z.string().min(1)).min(1),
-    created: dateOnlySchema,
-    last_updated: dateOnlySchema,
-    last_verified: dateOnlySchema,
-    stability: z.enum(["stable", "developing", "changing"]),
-    review_interval_days: z.number().int().positive(),
-    recommended_age_min: z.number().int().min(5).max(18),
-    recommended_age_max: z.number().int().min(5).max(18),
-    estimated_minutes: z.number().int().positive().max(60),
-    status: z.enum(["draft", "published"]),
-    sources: z.array(sourceSchema).min(1).max(8),
-  })
+  .discriminatedUnion("audience", [
+    z.object({
+      ...topicFields,
+      audience: z.literal("child"),
+      recommended_age_min: z.number().int().min(5).max(18),
+      recommended_age_max: z.number().int().min(5).max(18),
+    }),
+    z.object({
+      ...topicFields,
+      audience: z.literal("adult"),
+      recommended_age_min: z.never().optional(),
+      recommended_age_max: z.never().optional(),
+    }),
+  ])
   .superRefine((topic, context) => {
-    if (topic.recommended_age_min > topic.recommended_age_max) {
+    if (
+      topic.audience === "child" &&
+      topic.recommended_age_min > topic.recommended_age_max
+    ) {
       context.addIssue({
         code: "custom",
         path: ["recommended_age_max"],

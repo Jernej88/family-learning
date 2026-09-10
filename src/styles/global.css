@@ -266,7 +266,7 @@ ol {
 }
 
 .home-hero,
-.topic-list,
+.topic-library,
 .plain-page {
   width: min(1180px, calc(100% - 2rem));
   margin-inline: auto;
@@ -349,8 +349,12 @@ ol {
   font-size: clamp(2rem, 7vw, 4rem);
 }
 
-.topic-list {
+.topic-library {
   padding-block: 4rem 7rem;
+}
+
+.topic-list + .topic-list {
+  margin-top: 4rem;
 }
 
 .daily-challenge {

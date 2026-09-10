@@ -8,6 +8,8 @@ import { internalUrl } from "../lib/internal-url";
 const topics = (await getCollection("topics", ({ data }) => data.status === "published")).sort(
   (left, right) => right.data.last_updated.valueOf() - left.data.last_updated.valueOf(),
 );
+const childTopics = topics.filter(({ data }) => data.audience === "child");
+const adultTopics = topics.filter(({ data }) => data.audience === "adult");
 const reviewUrl = internalUrl("review/", import.meta.env.BASE_URL);
 ---
 
@@ -17,7 +19,7 @@ const reviewUrl = internalUrl("review/", import.meta.env.BASE_URL);
       <p class="eyebrow">Skupaj vprašamo. Skupaj odkrijemo.</p>
       <h1>Kaj bomo danes odkrili?</h1>
       <p>
-        Kratke interaktivne zgodbe v slovenščini pomagajo otrokom napovedati, poskusiti,
+        Interaktivne zgodbe v slovenščini pomagajo otrokom in odraslim raziskovati,
         razumeti in si zapomniti.
       </p>
       <a class="button" href="#teme">Izberi temo</a>
@@ -37,23 +39,50 @@ const reviewUrl = internalUrl("review/", import.meta.env.BASE_URL);
     <a class="button" href={reviewUrl}>Začni ponavljanje</a>
   </section>
 
-  <section class="topic-list" id="teme" aria-labelledby="topics-title">
-    <div class="section-heading">
-      <p class="eyebrow">Knjižnica</p>
-      <h2 id="topics-title">Začni z vprašanjem</h2>
-    </div>
-    <div class="topic-grid">
-      {
-        topics.map(({ data }) => (
-          <TopicCard
-            title={data.title}
-            slug={data.slug}
-            description={data.description}
-            category={data.category}
-            estimatedMinutes={data.estimated_minutes}
-          />
-        ))
-      }
-    </div>
-  </section>
+  <div class="topic-library" id="teme">
+    {
+      childTopics.length > 0 && (
+        <section class="topic-list" aria-labelledby="child-topics-title">
+          <div class="section-heading">
+            <p class="eyebrow">Knjižnica</p>
+            <h2 id="child-topics-title">Za otroke</h2>
+          </div>
+          <div class="topic-grid">
+            {childTopics.map(({ data }) => (
+              <TopicCard
+                title={data.title}
+                slug={data.slug}
+                description={data.description}
+                category={data.category}
+                audience={data.audience}
+                estimatedMinutes={data.estimated_minutes}
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
+    {
+      adultTopics.length > 0 && (
+        <section class="topic-list" aria-labelledby="adult-topics-title">
+          <div class="section-heading">
+            <p class="eyebrow">Knjižnica</p>
+            <h2 id="adult-topics-title">Za odrasle</h2>
+          </div>
+          <div class="topic-grid">
+            {adultTopics.map(({ data }) => (
+              <TopicCard
+                title={data.title}
+                slug={data.slug}
+                description={data.description}
+                category={data.category}
+                audience={data.audience}
+                estimatedMinutes={data.estimated_minutes}
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
 </BaseLayout>

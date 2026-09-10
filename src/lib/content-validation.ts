@@ -3,7 +3,7 @@ import remarkParse from "remark-parse";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
 
-import { quizSchema, type Quiz } from "./content-schema";
+import { quizSchema, type Quiz, type Topic } from "./content-schema";
 
 const meaningfulInteractions = [
   "Prediction",
@@ -48,7 +48,11 @@ export function validateStorySource(source: string): string[] {
   return errors;
 }
 
-export function validateQuiz(input: unknown, expectedTopic: string): {
+export function validateQuiz(
+  input: unknown,
+  expectedTopic: string,
+  audience: Topic["audience"] | undefined,
+): {
   data?: Quiz;
   errors: string[];
 } {
@@ -67,11 +71,15 @@ export function validateQuiz(input: unknown, expectedTopic: string): {
   }
 
   const seen = new Set<string>();
-  for (const question of result.data.questions) {
+  for (const [index, question] of result.data.questions.entries()) {
     if (seen.has(question.id)) {
       errors.push(`duplicate question id "${question.id}"`);
     }
     seen.add(question.id);
+
+    if (audience === "adult" && question.age_min !== 18) {
+      errors.push(`questions.${index}.age_min: adult topic questions must use 18`);
+    }
   }
 
   return { data: result.data, errors };

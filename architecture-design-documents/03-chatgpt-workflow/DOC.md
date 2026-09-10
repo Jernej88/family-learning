@@ -687,3 +687,16 @@ clearly separates both audiences.
 ## 14. Changelog
 
 —
+
+### 14.1 Implementation Slice Ledger
+
+- **`dds-03-chatgpt-workflow-ed24719c370d` — Add audience-aware content and
+  application behavior:** Implements Task 1 against the accepted design. The
+  slice branches from and targets `milestone-8-chatgpt-workflow` at
+  `77acd67c8a587831e46f9e447b124e74f3892880`, with no prerequisite slice and
+  the same SHA as its fork point. Acceptance requires valid audience/age schema
+  branches, visible audience grouping and labels, adult-topic isolation from
+  child progress and recall, complete root/subpath checks, and a clean
+  independent review. Tracking: [GitHub issue #10](https://github.com/Jernej88/family-learning/issues/10);
+  [pull request #11](https://github.com/Jernej88/family-learning/pull/11).
+  Notion tracking was explicitly omitted.

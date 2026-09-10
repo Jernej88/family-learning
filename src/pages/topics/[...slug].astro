@@ -5,6 +5,7 @@ import Quiz from "../../components/Quiz.astro";
 import TopicCompletion from "../../components/TopicCompletion.astro";
 import TopicLayout from "../../layouts/TopicLayout.astro";
 import type { Quiz as QuizData } from "../../lib/content-schema";
+import { getTopicAudienceBehavior } from "../../lib/topic-audience";
 import { getTopicQuiz } from "../../lib/topic-quiz";
 
 interface Props {
@@ -16,16 +17,17 @@ export async function getStaticPaths() {
   const topics = await getCollection("topics", ({ data }) => data.status === "published");
   return topics.map((topic) => ({
     params: { slug: topic.data.slug },
-    props: { topic, quiz: getTopicQuiz(topic.data.slug) },
+    props: { topic, quiz: getTopicQuiz(topic.data.slug, topic.data.audience) },
   }));
 }
 
 const { topic, quiz } = Astro.props;
 const { Content } = await render(topic);
+const audienceBehavior = getTopicAudienceBehavior(topic.data.audience);
 ---
 
 <TopicLayout {...topic.data}>
   <Content />
-  <TopicCompletion topic={topic.data.slug} />
-  <Quiz quiz={quiz} />
+  {audienceBehavior.showCompletion && <TopicCompletion topic={topic.data.slug} />}
+  <Quiz quiz={quiz} trackLearningHistory={audienceBehavior.trackLearningHistory} />
 </TopicLayout>
