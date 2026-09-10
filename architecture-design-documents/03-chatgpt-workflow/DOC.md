@@ -700,3 +700,16 @@ clearly separates both audiences.
   independent review. Tracking: [GitHub issue #10](https://github.com/Jernej88/family-learning/issues/10);
   [pull request #11](https://github.com/Jernej88/family-learning/pull/11).
   Notion tracking was explicitly omitted.
+- **`dds-03-chatgpt-workflow-1e6f36266763` — Establish the cloud Work authoring
+  boundary:** Implements Task 2 against the accepted design. The slice branches
+  from and targets `milestone-8-chatgpt-workflow` at
+  `dd3de53cbe0838273ffe8aa93930cace1eb1d6d5`, with no prerequisite slice and
+  the same SHA as its fork point. It protects `main`, versions the cloud
+  runbook and topic authoring/updating contracts, records the human review
+  rubric and handoff, and documents the local/Codex fallback. Acceptance
+  requires the approved branch boundary, complete validation, observed CI, and
+  a clean independent review. The connector-specific smoke test remains an
+  operator-run gate because the connector is unavailable in this session.
+  Tracking: [GitHub issue #12](https://github.com/Jernej88/family-learning/issues/12);
+  [pull request #13](https://github.com/Jernej88/family-learning/pull/13).
+  Notion tracking was explicitly omitted.
