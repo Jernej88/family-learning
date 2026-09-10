@@ -710,5 +710,6 @@ clearly separates both audiences.
   requires the approved branch boundary, complete validation, observed CI, and
   a clean independent review. The connector-specific smoke test remains an
   operator-run gate because the connector is unavailable in this session.
-  Tracking: [GitHub issue #12](https://github.com/Jernej88/family-learning/issues/12).
+  Tracking: [GitHub issue #12](https://github.com/Jernej88/family-learning/issues/12);
+  [pull request #13](https://github.com/Jernej88/family-learning/pull/13).
   Notion tracking was explicitly omitted.
