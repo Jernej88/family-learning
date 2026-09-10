@@ -1,4 +1,4 @@
-import type { Quiz } from "./content-schema";
+import type { Quiz, Topic } from "./content-schema";
 import { validateQuiz } from "./content-validation";
 
 const quizFiles = import.meta.glob("../content/topics/*/quiz.json", {
@@ -6,9 +6,9 @@ const quizFiles = import.meta.glob("../content/topics/*/quiz.json", {
   import: "default",
 });
 
-export function getTopicQuiz(slug: string): Quiz {
+export function getTopicQuiz(slug: string, audience: Topic["audience"]): Quiz {
   const path = `../content/topics/${slug}/quiz.json`;
-  const result = validateQuiz(quizFiles[path], slug);
+  const result = validateQuiz(quizFiles[path], slug, audience);
   if (!result.data || result.errors.length > 0) {
     throw new Error(`${path}: ${result.errors.join("; ") || "quiz file not found"}`);
   }

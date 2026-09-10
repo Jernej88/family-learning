@@ -3,13 +3,19 @@ import type { Quiz } from "../lib/content-schema";
 
 interface Props {
   quiz: Quiz;
+  trackLearningHistory?: boolean;
 }
 
-const { quiz } = Astro.props;
+const { quiz, trackLearningHistory = true } = Astro.props;
 const serializedQuiz = JSON.stringify(quiz).replace(/</g, "\\u003c");
 ---
 
-<section class="topic-quiz" data-topic-quiz aria-labelledby="topic-quiz-title">
+<section
+  class="topic-quiz"
+  data-topic-quiz
+  data-track-learning-history={trackLearningHistory ? "true" : "false"}
+  aria-labelledby="topic-quiz-title"
+>
   <script type="application/json" data-quiz-data set:html={serializedQuiz} is:inline />
 
   <div class="topic-quiz__intro" data-quiz-intro>
@@ -76,12 +82,8 @@ const serializedQuiz = JSON.stringify(quiz).replace(/</g, "\\u003c");
   } from "../lib/quiz-storage";
   import {
     LEARNING_STATE_EVENT,
-    getActiveProfile,
-    loadLearningState,
-    saveLearningState,
-    setQuestionHistory,
   } from "../lib/learning-state";
-  import { todayDate, updateQuestionHistory } from "../lib/review";
+  import { recordQuizQuestionHistory } from "../lib/quiz-learning";
 
   for (const root of document.querySelectorAll<HTMLElement>("[data-topic-quiz]")) {
     if (root.dataset.ready === "true") continue;
@@ -90,6 +92,7 @@ const serializedQuiz = JSON.stringify(quiz).replace(/</g, "\\u003c");
     const data = root.querySelector<HTMLElement>("[data-quiz-data]");
     if (!data?.textContent) continue;
     const quiz = JSON.parse(data.textContent) as Quiz;
+    const trackLearningHistory = root.dataset.trackLearningHistory === "true";
     const questionsById = new Map(quiz.questions.map((question) => [question.id, question]));
 
     const intro = root.querySelector<HTMLElement>("[data-quiz-intro]")!;
@@ -176,19 +179,15 @@ const serializedQuiz = JSON.stringify(quiz).replace(/</g, "\\u003c");
           saveQuizSession(storage, session);
           const answer = session.answers[question.id];
           if (!previousAnswer && answer) {
-            const learningState = loadLearningState(storage);
-            const profile = getActiveProfile(learningState);
-            if (profile) {
-              const history = updateQuestionHistory(
-                profile.questionHistory[question.id],
+            if (
+              recordQuizQuestionHistory(
+                storage,
+                trackLearningHistory,
                 question.id,
                 answer.correct,
-                todayDate(),
-              );
-              const nextLearningState = setQuestionHistory(learningState, profile.id, history);
-              if (saveLearningState(storage, nextLearningState)) {
-                window.dispatchEvent(new CustomEvent(LEARNING_STATE_EVENT));
-              }
+              )
+            ) {
+              window.dispatchEvent(new CustomEvent(LEARNING_STATE_EVENT));
             }
           }
           renderSession();

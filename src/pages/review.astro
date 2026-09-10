@@ -4,12 +4,13 @@ import { getCollection } from "astro:content";
 import DailyReview from "../components/DailyReview.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { internalUrl } from "../lib/internal-url";
+import { isPublishedChildTopic } from "../lib/topic-audience";
 import { getTopicQuiz } from "../lib/topic-quiz";
 import type { ReviewQuestion } from "../lib/review";
 
-const topics = await getCollection("topics", ({ data }) => data.status === "published");
+const topics = await getCollection("topics", isPublishedChildTopic);
 const questions: ReviewQuestion[] = topics.flatMap((topic) =>
-  getTopicQuiz(topic.data.slug).questions.map((question) => ({
+  getTopicQuiz(topic.data.slug, topic.data.audience).questions.map((question) => ({
     topic: topic.data.slug,
     topicTitle: topic.data.title,
     question,
